@@ -73,6 +73,21 @@
 - `cmd/root.go` — added `--compact` and `--bom` persistent flags, bound to viper
 - Dependencies added: `olekukonko/tablewriter`, `fatih/color`, `golang.org/x/term`
 
+### 2026-03-18 — Phase 1.6 GAQL Queries (Tier 2)
+- `internal/api/gaql.go` — NEW: `ExecuteGAQL(customerID, query)` method on `Client`
+  - POSTs to `/v18/customers/{customerID}/googleAds:searchStream`
+  - Parses streaming JSON array response (`[]SearchGoogleAdsStreamResponse`)
+  - Falls back to single-object parse for defensive compatibility
+  - Flattens nested result objects to dot-separated key maps (e.g. `campaign.name`)
+  - Derives ordered headers from `fieldMask` in response; falls back to first-row keys
+  - Normalises customer IDs (strips dashes before use in URL path)
+- `cmd/helpers.go` — NEW: `buildAPIClient()` shared helper + `staticTokenSource` for `GADS_ACCESS_TOKEN` env var
+- `cmd/query.go` — NEW: `gads query` command
+  - `gads query "<GAQL string>"` — inline query
+  - `gads query -f <file.gaql>` — query from file
+  - Routes results through output formatters (`--output table|json|csv`)
+  - `--customer-id` flag (global) overrides default; GAQL syntax errors pass through from API
+
 ## In Progress
 (none)
 

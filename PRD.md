@@ -57,13 +57,13 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.6 GAQL Queries (Tier 2)
 
-- [ ] `gads query "<GAQL string>"` — execute inline GAQL query against configured customer ID
-- [ ] `gads query -f <file.gaql>` — read query from file
-- [ ] POST to `googleads.googleapis.com/v18/customers/{customerId}/googleAds:searchStream`
-- [ ] Parse streaming response into rows
-- [ ] Route through output formatters (`--output table|json|csv`)
-- [ ] Support `--customer-id` flag to override default
-- [ ] Useful error messages for GAQL syntax errors (pass through Google's error details)
+- [x] `gads query "<GAQL string>"` — execute inline GAQL query against configured customer ID
+- [x] `gads query -f <file.gaql>` — read query from file
+- [x] POST to `googleads.googleapis.com/v18/customers/{customerId}/googleAds:searchStream`
+- [x] Parse streaming response into rows
+- [x] Route through output formatters (`--output table|json|csv`)
+- [x] Support `--customer-id` flag to override default
+- [x] Useful error messages for GAQL syntax errors (pass through Google's error details)
 
 ### 1.7 Raw API Escape Hatch (Tier 3)
 
