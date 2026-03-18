@@ -268,6 +268,13 @@
 - `cmd/ad_groups.go` — UPDATED: `--date-range` completion for stats
 - `cmd/keywords.go` — UPDATED: `--match-type` completion (BROAD, PHRASE, EXACT)
 
+### 2026-03-18 — Phase 5.1 Saved Queries
+- `cmd/query.go` — UPDATED: added three subcommands to `gads query`
+  - `save <name> [GAQL]`: saves query to `~/.gads/queries/<name>.gaql` (0600 perms); accepts inline GAQL arg or `-f <file.gaql>`; auto-creates `~/.gads/queries/` directory
+  - `run <name>`: loads saved query from `~/.gads/queries/<name>.gaql`, validates (unless `--no-validate`), executes via API, routes through output formatters
+  - `saved`: lists all `.gaql` files in `~/.gads/queries/` with a 60-char query preview; prints "No saved queries." when empty
+- Helpers added: `savedQueriesDir()`, `savedQueryPath(name)` (shared by all three subcommands)
+
 ## In Progress
 (none)
 

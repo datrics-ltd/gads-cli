@@ -191,10 +191,10 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 5.1 Saved Queries
 
-- [ ] `gads query save <name> -f <file.gaql>` — save a query to config dir
-- [ ] `gads query save <name> "<GAQL string>"` — save inline query
-- [ ] `gads query run <name>` — execute a saved query
-- [ ] `gads query saved` — list all saved queries
+- [x] `gads query save <name> -f <file.gaql>` — save a query to config dir
+- [x] `gads query save <name> "<GAQL string>"` — save inline query
+- [x] `gads query run <name>` — execute a saved query
+- [x] `gads query saved` — list all saved queries
 
 ### 5.2 Multi-Profile
 
