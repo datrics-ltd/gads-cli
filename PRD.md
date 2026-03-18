@@ -129,9 +129,9 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 2.5 Budgets
 
-- [ ] `gads budgets list` — list all budgets
-- [ ] `gads budgets get <budget-id>` — detailed view
-- [ ] `gads budgets set <budget-id> --amount <amount>` — update daily budget amount
+- [x] `gads budgets list` — list all budgets
+- [x] `gads budgets get <budget-id>` — detailed view
+- [x] `gads budgets set <budget-id> --amount <amount>` — update daily budget amount
 
 ### 2.6 Account
 

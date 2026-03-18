@@ -144,6 +144,12 @@
   - `enable <keyword-id>`: same mutate pattern, sets status to ENABLED
   - `add --ad-group <id> --text "<keyword>" --match-type <BROAD|PHRASE|EXACT>`: POSTs create operation to `adGroupCriteria:mutate`
 
+### 2026-03-18 — Phase 2.5 Budgets
+- `cmd/budgets.go` — NEW: `gads budgets` command with three subcommands
+  - `list`: GAQL query against `campaign_budget` resource; shows ID, name, amount_micros, status, delivery_method, explicitly_shared, reference_count
+  - `get <budget-id>`: GAQL lookup by `campaign_budget.id`; shows same fields plus recommended_budget_amount_micros and total_amount_micros
+  - `set <budget-id> --amount <amount>`: POST to `campaignBudgets:mutate` with `updateMask=amountMicros`, converts float amount to micros (×1,000,000); validates amount is positive
+
 ## In Progress
 (none)
 
