@@ -275,6 +275,14 @@
   - `saved`: lists all `.gaql` files in `~/.gads/queries/` with a 60-char query preview; prints "No saved queries." when empty
 - Helpers added: `savedQueriesDir()`, `savedQueryPath(name)` (shared by all three subcommands)
 
+### 2026-03-18 — Phase 5.2 Multi-Profile
+- `internal/config/config.go` — UPDATED: added `ApplyProfile(*cobra.Command) error`
+  - Reads `profiles.<name>.*` from config file when `--profile <name>` is set
+  - Applies profile values via `viper.Set()` only if the corresponding flag was NOT explicitly changed and the corresponding `GADS_<KEY>` env var is not set
+  - Returns a clear error when the named profile doesn't exist
+- `cmd/root.go` — UPDATED: `PersistentPreRunE` now calls `config.ApplyProfile(cmd)` after `config.Init()`
+- `internal/config/config_test.go` — UPDATED: 5 new tests covering ApplyProfile (no-op, override base, flag wins, env wins, profile-not-found)
+
 ## In Progress
 (none)
 

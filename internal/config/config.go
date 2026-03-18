@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -62,6 +63,54 @@ func Init() error {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return fmt.Errorf("reading config file: %w", err)
 		}
+	}
+
+	return nil
+}
+
+// ApplyProfile overlays the named profile's values on top of the base config.
+// Profile values override config-file defaults but are themselves overridden by
+// explicit flags (cmd.Changed) and environment variables.
+//
+// Profiles are stored in config.yaml under the "profiles" key:
+//
+//	profiles:
+//	  client-a:
+//	    customer_id: "111-222-3333"
+//	  client-b:
+//	    customer_id: "444-555-6666"
+//	    output: json
+func ApplyProfile(cmd *cobra.Command) error {
+	profile := viper.GetString("profile")
+	if profile == "" {
+		return nil
+	}
+
+	profileKey := "profiles." + profile
+	profileMap := viper.GetStringMap(profileKey)
+	if len(profileMap) == 0 {
+		return fmt.Errorf("profile %q not found in config", profile)
+	}
+
+	for k, v := range profileMap {
+		// Convert profile key to flag name (underscores → dashes).
+		flagName := strings.ReplaceAll(k, "_", "-")
+
+		// If the user explicitly passed this flag on the command line, it wins.
+		if f := cmd.Root().PersistentFlags().Lookup(flagName); f != nil && f.Changed {
+			continue
+		}
+
+		// If a GADS_ env var for this key is set, it wins.
+		envKey := "GADS_" + strings.ToUpper(k)
+		if os.Getenv(envKey) != "" {
+			continue
+		}
+
+		// Apply the profile value at the highest viper priority so it overrides
+		// anything that came from the config file but yields to flags and env vars
+		// (which we already checked above).
+		viper.Set(k, v)
 	}
 
 	return nil

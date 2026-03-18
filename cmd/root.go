@@ -24,7 +24,10 @@ Documentation: https://github.com/datrics-ltd/gads-cli`,
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		return config.Init()
+		if err := config.Init(); err != nil {
+			return err
+		}
+		return config.ApplyProfile(cmd)
 	},
 }
 

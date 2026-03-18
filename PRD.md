@@ -198,8 +198,8 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 5.2 Multi-Profile
 
-- [ ] `--profile <name>` flag on all commands — use named profile from config
-- [ ] Profile inherits base config, overrides specific values (customer_id, etc.)
+- [x] `--profile <name>` flag on all commands — use named profile from config
+- [x] Profile inherits base config, overrides specific values (customer_id, etc.)
 
 ### 5.3 UX Polish
 

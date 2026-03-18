@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -142,6 +143,95 @@ func TestConfigDirAutoCreate(t *testing.T) {
 
 	if _, err := os.Stat(gadsDir); err != nil {
 		t.Errorf("expected .gads dir to be created by Init(), got: %v", err)
+	}
+}
+
+// newTestCmd returns a minimal Cobra command with a --customer-id persistent flag for profile tests.
+func newTestCmd() *cobra.Command {
+	root := &cobra.Command{Use: "test"}
+	root.PersistentFlags().String("customer-id", "", "")
+	root.PersistentFlags().String("output", "table", "")
+	return root
+}
+
+func TestApplyProfileNoOp(t *testing.T) {
+	viper.Reset()
+	// No profile set — ApplyProfile should be a no-op and return nil.
+	cmd := newTestCmd()
+	if err := ApplyProfile(cmd); err != nil {
+		t.Fatalf("expected no error with empty profile, got: %v", err)
+	}
+}
+
+func TestApplyProfileOverridesBaseConfig(t *testing.T) {
+	viper.Reset()
+	// Set base config customer_id.
+	viper.Set("customer_id", "base-customer")
+	// Set profile data in viper.
+	viper.Set("profiles.client-a.customer_id", "profile-customer")
+	viper.Set("profile", "client-a")
+
+	cmd := newTestCmd()
+	if err := ApplyProfile(cmd); err != nil {
+		t.Fatalf("ApplyProfile: %v", err)
+	}
+
+	if got := viper.GetString("customer_id"); got != "profile-customer" {
+		t.Errorf("customer_id: got %q, want %q", got, "profile-customer")
+	}
+}
+
+func TestApplyProfileFlagTakesPrecedence(t *testing.T) {
+	viper.Reset()
+	viper.Set("profiles.client-a.customer_id", "profile-customer")
+	viper.Set("profile", "client-a")
+
+	cmd := newTestCmd()
+	// Simulate user explicitly passing --customer-id on the command line.
+	if err := cmd.PersistentFlags().Set("customer-id", "flag-customer"); err != nil {
+		t.Fatalf("setting flag: %v", err)
+	}
+	// Bind the pflag to viper so viper sees the flag value.
+	_ = viper.BindPFlag("customer_id", cmd.PersistentFlags().Lookup("customer-id"))
+
+	if err := ApplyProfile(cmd); err != nil {
+		t.Fatalf("ApplyProfile: %v", err)
+	}
+
+	// Flag value must win over profile.
+	if got := viper.GetString("customer_id"); got != "flag-customer" {
+		t.Errorf("customer_id: got %q, want %q (flag should win)", got, "flag-customer")
+	}
+}
+
+func TestApplyProfileEnvVarTakesPrecedence(t *testing.T) {
+	viper.Reset()
+	viper.Set("profiles.client-a.customer_id", "profile-customer")
+	viper.Set("profile", "client-a")
+	t.Setenv("GADS_CUSTOMER_ID", "env-customer")
+
+	cmd := newTestCmd()
+	if err := ApplyProfile(cmd); err != nil {
+		t.Fatalf("ApplyProfile: %v", err)
+	}
+
+	// Env var should win — ApplyProfile skips keys whose env var is set.
+	// After ApplyProfile, customer_id should NOT be the profile value because we skipped it.
+	// The actual resolved value comes from viper's env binding (done elsewhere in Init),
+	// but here we verify ApplyProfile did NOT call viper.Set("customer_id", "profile-customer").
+	if got := viper.GetString("customer_id"); got == "profile-customer" {
+		t.Errorf("profile value should not override env var")
+	}
+}
+
+func TestApplyProfileNotFound(t *testing.T) {
+	viper.Reset()
+	viper.Set("profile", "nonexistent-profile")
+
+	cmd := newTestCmd()
+	err := ApplyProfile(cmd)
+	if err == nil {
+		t.Fatal("expected error for missing profile, got nil")
 	}
 }
 
