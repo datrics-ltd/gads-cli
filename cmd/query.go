@@ -189,10 +189,11 @@ Examples:
 }
 
 var querySavedCmd = &cobra.Command{
-	Use:   "saved",
-	Short: "List all saved GAQL queries",
-	Long:  `List all GAQL queries that have been saved with 'gads query save'.`,
-	Args:  cobra.NoArgs,
+	Use:     "saved",
+	Short:   "List all saved GAQL queries",
+	Long:    `List all GAQL queries that have been saved with 'gads query save'.`,
+	Example: `  gads query saved`,
+	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dir, err := savedQueriesDir()
 		if err != nil {

@@ -17,6 +17,9 @@ var accountCmd = &cobra.Command{
 	Use:   "account",
 	Short: "Manage Google Ads account settings",
 	Long:  "View account info, list accessible customers, and switch the active customer ID.",
+	Example: `  gads account info
+  gads account customers
+  gads account switch 123-456-7890`,
 }
 
 var accountInfoCmd = &cobra.Command{

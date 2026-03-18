@@ -14,6 +14,11 @@ var adsCmd = &cobra.Command{
 	Use:   "ads",
 	Short: "Manage Google Ads ads",
 	Long:  "List, inspect, pause, and enable Google Ads ads.",
+	Example: `  gads ads list --campaign 12345678901
+  gads ads list --ad-group 12345678901
+  gads ads get 12345678901
+  gads ads pause 12345678901
+  gads ads enable 12345678901`,
 }
 
 var adsListCmd = &cobra.Command{

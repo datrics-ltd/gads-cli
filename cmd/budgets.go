@@ -15,6 +15,9 @@ var budgetsCmd = &cobra.Command{
 	Use:   "budgets",
 	Short: "Manage Google Ads campaign budgets",
 	Long:  "List, inspect, and update Google Ads campaign budgets.",
+	Example: `  gads budgets list
+  gads budgets get 12345678
+  gads budgets set 12345678 --amount 50.00`,
 }
 
 var budgetsListCmd = &cobra.Command{

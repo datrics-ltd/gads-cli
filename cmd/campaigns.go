@@ -14,6 +14,12 @@ var campaignsCmd = &cobra.Command{
 	Use:   "campaigns",
 	Short: "Manage Google Ads campaigns",
 	Long:  "List, inspect, pause, enable, and view stats for Google Ads campaigns.",
+	Example: `  gads campaigns list
+  gads campaigns list --status ENABLED --output json
+  gads campaigns get 12345678901
+  gads campaigns pause 12345678901
+  gads campaigns enable 12345678901
+  gads campaigns stats 12345678901 --date-range LAST_7_DAYS`,
 }
 
 var campaignsListCmd = &cobra.Command{

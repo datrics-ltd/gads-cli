@@ -207,7 +207,7 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 - [x] Color coding for campaign/ad/keyword statuses
 - [x] `--verbose` debug output on all commands
 - [x] Man page generation (Cobra built-in)
-- [ ] Help text polish — examples in every command's `--help`
+- [x] Help text polish — examples in every command's `--help`
 
 ---
 

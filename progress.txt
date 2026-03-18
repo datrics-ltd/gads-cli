@@ -292,6 +292,15 @@
   - Writes one `.1` man page per command/subcommand (e.g. `gads-campaigns-list.1`)
   - Added `github.com/cpuguy83/go-md2man/v2` + `github.com/russross/blackfriday/v2` dependencies (via `github.com/spf13/cobra/doc`)
 
+### 2026-03-18 — Phase 5.3 Help Text Polish
+- Added `Example` field to every command's `--help` output
+  - `auth` parent + login/status/logout/refresh subcommands
+  - `campaigns`, `ad-groups`, `ads`, `keywords`, `budgets`, `account` parent commands
+  - `config` parent command
+  - `query saved` subcommand
+  - `update`, `version`, `completion` commands
+- All examples follow the two-space indent convention used throughout the codebase
+
 ## In Progress
 (none)
 

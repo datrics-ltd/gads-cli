@@ -13,6 +13,10 @@ var authCmd = &cobra.Command{
 	Use:   "auth",
 	Short: "Manage authentication",
 	Long:  `Commands for managing Google OAuth2 authentication.`,
+	Example: `  gads auth login
+  gads auth status
+  gads auth logout
+  gads auth refresh`,
 }
 
 var authLoginCmd = &cobra.Command{
@@ -25,7 +29,8 @@ Requires client_id and client_secret to be configured:
 
   gads config set client_id     YOUR_CLIENT_ID
   gads config set client_secret YOUR_CLIENT_SECRET`,
-	Args: cobra.NoArgs,
+	Example: `  gads auth login`,
+	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		clientID := viper.GetString("client_id")
 		clientSecret := viper.GetString("client_secret")
@@ -46,10 +51,11 @@ Requires client_id and client_secret to be configured:
 }
 
 var authStatusCmd = &cobra.Command{
-	Use:   "status",
-	Short: "Show current authentication state",
-	Long:  `Show whether you are logged in, when the access token expires, and whether required config values are set.`,
-	Args:  cobra.NoArgs,
+	Use:     "status",
+	Short:   "Show current authentication state",
+	Long:    `Show whether you are logged in, when the access token expires, and whether required config values are set.`,
+	Example: `  gads auth status`,
+	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		developerToken := viper.GetString("developer_token")
 		clientID := viper.GetString("client_id")
@@ -97,10 +103,11 @@ var authStatusCmd = &cobra.Command{
 }
 
 var authLogoutCmd = &cobra.Command{
-	Use:   "logout",
-	Short: "Revoke tokens and delete local credentials",
-	Long:  `Revoke the access token at Google and delete ~/.gads/credentials.json.`,
-	Args:  cobra.NoArgs,
+	Use:     "logout",
+	Short:   "Revoke tokens and delete local credentials",
+	Long:    `Revoke the access token at Google and delete ~/.gads/credentials.json.`,
+	Example: `  gads auth logout`,
+	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		clientID := viper.GetString("client_id")
 		clientSecret := viper.GetString("client_secret")
@@ -120,10 +127,12 @@ var authLogoutCmd = &cobra.Command{
 }
 
 var authRefreshCmd = &cobra.Command{
-	Use:   "refresh",
-	Short: "Force-refresh the access token",
-	Long:  `Use the stored refresh token to obtain a new access token immediately.`,
-	Args:  cobra.NoArgs,
+	Use:     "refresh",
+	Short:   "Force-refresh the access token",
+	Long:    `Use the stored refresh token to obtain a new access token immediately.`,
+	Example: `  gads auth refresh
+  gads auth refresh --verbose`,
+	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		clientID := viper.GetString("client_id")
 		clientSecret := viper.GetString("client_secret")

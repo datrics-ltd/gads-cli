@@ -14,6 +14,11 @@ var adGroupsCmd = &cobra.Command{
 	Use:   "ad-groups",
 	Short: "Manage Google Ads ad groups",
 	Long:  "List, inspect, pause, enable, and view stats for Google Ads ad groups.",
+	Example: `  gads ad-groups list --campaign 12345678901
+  gads ad-groups get 12345678901
+  gads ad-groups pause 12345678901
+  gads ad-groups enable 12345678901
+  gads ad-groups stats 12345678901 --date-range LAST_30_DAYS`,
 }
 
 var adGroupsListCmd = &cobra.Command{

@@ -22,6 +22,11 @@ Values are read with this precedence (highest wins):
   2. Environment variables (GADS_ prefix)
   3. Config file (~/.gads/config.yaml)
   4. Defaults`,
+	Example: `  gads config set developer_token AbCdEf123456
+  gads config set default_customer_id 123-456-7890
+  gads config get default_customer_id
+  gads config list
+  gads config path`,
 }
 
 var configSetCmd = &cobra.Command{

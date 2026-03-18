@@ -21,11 +21,12 @@ const (
 )
 
 var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Update gads to the latest version",
-	Long:  `Check for the latest release and update gads to it, verifying the checksum.`,
-	Args:  cobra.NoArgs,
-	RunE:  runUpdate,
+	Use:     "update",
+	Short:   "Update gads to the latest version",
+	Long:    `Check for the latest release and update gads to it, verifying the checksum.`,
+	Example: `  gads update`,
+	Args:    cobra.NoArgs,
+	RunE:    runUpdate,
 }
 
 func init() {

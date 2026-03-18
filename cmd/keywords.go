@@ -14,6 +14,12 @@ var keywordsCmd = &cobra.Command{
 	Use:   "keywords",
 	Short: "Manage Google Ads keywords",
 	Long:  "List, inspect, pause, enable, and add Google Ads keywords.",
+	Example: `  gads keywords list --campaign 12345678901
+  gads keywords list --ad-group 12345678901
+  gads keywords get 12345678901
+  gads keywords pause 12345678901
+  gads keywords enable 12345678901
+  gads keywords add --ad-group 12345678901 --text "running shoes" --match-type BROAD`,
 }
 
 var keywordsListCmd = &cobra.Command{

@@ -8,8 +8,12 @@ import (
 )
 
 var completionCmd = &cobra.Command{
-	Use:   "completion [bash|zsh|fish|powershell]",
-	Short: "Generate shell completion scripts",
+	Use:     "completion [bash|zsh|fish|powershell]",
+	Short:   "Generate shell completion scripts",
+	Example: `  gads completion bash > /etc/bash_completion.d/gads
+  gads completion zsh > "${fpath[1]}/_gads"
+  gads completion fish > ~/.config/fish/completions/gads.fish
+  gads completion powershell > gads.ps1`,
 	Long: `Generate shell completion scripts for gads.
 
 To load completions:
