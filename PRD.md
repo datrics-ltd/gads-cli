@@ -135,9 +135,9 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 2.6 Account
 
-- [ ] `gads account info` — current account details
-- [ ] `gads account customers` — list accessible customer accounts (useful for MCC)
-- [ ] `gads account switch <customer-id>` — update default customer ID in config
+- [x] `gads account info` — current account details
+- [x] `gads account customers` — list accessible customer accounts (useful for MCC)
+- [x] `gads account switch <customer-id>` — update default customer ID in config
 
 ---
 

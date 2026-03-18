@@ -150,6 +150,12 @@
   - `get <budget-id>`: GAQL lookup by `campaign_budget.id`; shows same fields plus recommended_budget_amount_micros and total_amount_micros
   - `set <budget-id> --amount <amount>`: POST to `campaignBudgets:mutate` with `updateMask=amountMicros`, converts float amount to micros (×1,000,000); validates amount is positive
 
+### 2026-03-18 — Phase 2.6 Account
+- `cmd/account.go` — NEW: `gads account` command with three subcommands
+  - `info`: GAQL query against `customer` resource; shows ID, name, currency_code, time_zone, status, manager, test_account, auto_tagging_enabled
+  - `customers`: GET `/v18/customers:listAccessibleCustomers`; shows customer_id and resource_name for all accessible accounts (useful for MCC)
+  - `switch <customer-id>`: updates `default_customer_id` in `~/.gads/config.yaml`; confirms on stderr unless --quiet
+
 ## In Progress
 (none)
 
