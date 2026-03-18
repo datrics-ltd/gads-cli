@@ -244,6 +244,19 @@
   - `--filterable` flag: filters to only GAQL WHERE-compatible fields
   - `--live` flag: fetches live field metadata from `GoogleAdsFieldService` (`POST /v18/googleAdsFields:search`) instead of embedded schema; sorts by field name for consistent output
 
+### 2026-03-18 — Phase 4.3 GAQL Query Validation
+- `internal/schema/validate.go` — NEW: GAQL query validator
+  - `ValidateGAQL(gaql string) error` — parses query clauses (SELECT, FROM, WHERE, ORDER BY) and validates against embedded schema
+  - Cross-resource field detection: flags ATTRIBUTE fields used against the wrong FROM resource
+  - Non-selectable field detection: errors when a known field is not selectable (SELECT clause)
+  - Non-filterable field detection: errors when a known field is not filterable (WHERE clause)
+  - Non-sortable field detection: errors when a known field is not sortable (ORDER BY clause)
+  - Conservative: unknown fields (not in embedded schema) are silently skipped to avoid false positives
+  - Unknown resources (not in embedded schema) skip all validation
+  - `ValidationError` type with structured `[]ValidationIssue` for multi-error reporting
+- `internal/schema/validate_test.go` — NEW: 12 tests covering all validation paths
+- `cmd/query.go` — UPDATED: validates GAQL before sending to API; `--no-validate` flag bypasses local validation
+
 ## In Progress
 (none)
 

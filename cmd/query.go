@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/datrics-ltd/gads-cli/internal/schema"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -47,6 +48,13 @@ func runQuery(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("provide a GAQL query as an argument or use -f <file.gaql>")
 	}
 
+	// Validate GAQL before sending to the API.
+	if !viper.GetBool("no_validate") {
+		if err := schema.ValidateGAQL(gaql); err != nil {
+			return err
+		}
+	}
+
 	client, err := buildAPIClient()
 	if err != nil {
 		return err
@@ -63,5 +71,7 @@ func runQuery(cmd *cobra.Command, args []string) error {
 
 func init() {
 	queryCmd.Flags().StringP("file", "f", "", "Read GAQL query from file")
+	queryCmd.Flags().Bool("no-validate", false, "Skip local GAQL validation (send query directly to API)")
+	_ = viper.BindPFlag("no_validate", queryCmd.Flags().Lookup("no-validate"))
 	rootCmd.AddCommand(queryCmd)
 }
