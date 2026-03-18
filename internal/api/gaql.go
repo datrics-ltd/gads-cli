@@ -8,7 +8,7 @@ import (
 )
 
 // apiVersion is the Google Ads API version used for all requests.
-const apiVersion = "v18"
+const apiVersion = "v23"
 
 // searchStreamResponse is one chunk from the googleAds:searchStream endpoint.
 type searchStreamResponse struct {

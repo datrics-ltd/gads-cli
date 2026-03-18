@@ -33,11 +33,12 @@ func buildAPIClient() (*api.Client, error) {
 	}
 
 	return api.NewClient(api.Config{
-		DeveloperToken: viper.GetString("developer_token"),
-		TokenSource:    tokenSource,
-		CustomerID:     viper.GetString("customer_id"),
-		Verbose:        viper.GetBool("verbose"),
-		Retries:        viper.GetInt("retries"),
+		DeveloperToken:  viper.GetString("developer_token"),
+		TokenSource:     tokenSource,
+		CustomerID:      viper.GetString("customer_id"),
+		LoginCustomerID: viper.GetString("login_customer_id"),
+		Verbose:         viper.GetBool("verbose"),
+		Retries:         viper.GetInt("retries"),
 	}), nil
 }
 

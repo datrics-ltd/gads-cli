@@ -33,21 +33,23 @@ type TokenSource interface {
 
 // Client is an authenticated HTTP client for the Google Ads REST API.
 type Client struct {
-	developerToken string
-	tokenSource    TokenSource
-	customerID     string
-	retries        int
-	verbose        bool
-	http           *http.Client
+	developerToken  string
+	tokenSource     TokenSource
+	customerID      string
+	loginCustomerID string
+	retries         int
+	verbose         bool
+	http            *http.Client
 }
 
 // Config holds options for creating a new Client.
 type Config struct {
-	DeveloperToken string
-	TokenSource    TokenSource
-	CustomerID     string
-	Retries        int
-	Verbose        bool
+	DeveloperToken  string
+	TokenSource     TokenSource
+	CustomerID      string
+	LoginCustomerID string
+	Retries         int
+	Verbose         bool
 }
 
 // NewClient creates a new API client with the provided configuration.
@@ -57,12 +59,13 @@ func NewClient(cfg Config) *Client {
 		retries = DefaultRetries
 	}
 	return &Client{
-		developerToken: cfg.DeveloperToken,
-		tokenSource:    cfg.TokenSource,
-		customerID:     cfg.CustomerID,
-		retries:        retries,
-		verbose:        cfg.Verbose,
-		http:           &http.Client{Timeout: defaultTimeout},
+		developerToken:  cfg.DeveloperToken,
+		tokenSource:     cfg.TokenSource,
+		customerID:      cfg.CustomerID,
+		loginCustomerID: cfg.LoginCustomerID,
+		retries:         retries,
+		verbose:         cfg.Verbose,
+		http:            &http.Client{Timeout: defaultTimeout},
 	}
 }
 
@@ -180,6 +183,9 @@ func (c *Client) CustomerID() string {
 func (c *Client) injectAuthHeaders(req *http.Request) error {
 	if c.developerToken != "" {
 		req.Header.Set("developer-token", c.developerToken)
+	}
+	if c.loginCustomerID != "" {
+		req.Header.Set("login-customer-id", c.loginCustomerID)
 	}
 	if c.tokenSource != nil {
 		token, err := c.tokenSource.AccessToken()
