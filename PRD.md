@@ -1,0 +1,223 @@
+# gads-cli — Product Requirements Document
+
+A cross-platform CLI for the Google Ads API. Built in Go, distributed as single binaries. Three-tier command model: named commands, GAQL queries, raw API escape hatch.
+
+See `SPEC.md` for full technical specification, architecture decisions, and rationale.
+
+---
+
+## Phase 1 — Foundation (MVP)
+
+After this phase, the CLI can do everything the Google Ads API supports via `gads query` and `gads api`. Everything after is convenience.
+
+### 1.1 Project Scaffolding
+
+- [ ] Initialize Go module (`github.com/datrics-ltd/gads-cli`)
+- [ ] Set up Cobra root command with global flags (`--customer-id`, `--output`, `--profile`, `--verbose`, `--quiet`, `--no-color`)
+- [ ] Set up Viper config integration (config file + env vars + flag binding)
+- [ ] Create directory structure: `cmd/`, `internal/api/`, `internal/auth/`, `internal/config/`, `internal/output/`
+- [ ] Add `version` command with build-time version injection via `-ldflags`
+- [ ] Add `.gitignore` for Go project
+
+### 1.2 Configuration
+
+- [ ] Config file at `~/.gads/config.yaml` — auto-create directory on first use
+- [ ] `gads config set <key> <value>` — write to config file
+- [ ] `gads config get <key>` — read from config file
+- [ ] `gads config list` — show all config, redact sensitive values (tokens, secrets)
+- [ ] `gads config path` — print config file location
+- [ ] Environment variable overrides with `GADS_` prefix (see SPEC.md for mapping)
+- [ ] Precedence: flag > env var > config file > default
+
+### 1.3 Authentication — OAuth2
+
+- [ ] `gads auth login` — start local HTTP server, open browser to Google OAuth2 consent screen, handle callback, exchange code for tokens, store refresh token
+- [ ] Credential storage at `~/.gads/credentials.json` with `0600` permissions
+- [ ] Token refresh — auto-refresh expired access tokens before API calls using stored refresh token
+- [ ] `gads auth status` — show current auth state (logged in as who, token expiry, developer token configured?)
+- [ ] `gads auth logout` — revoke tokens and delete local credentials
+- [ ] `gads auth refresh` — force-refresh the access token
+- [ ] Support `GADS_ACCESS_TOKEN` env var for CI/non-interactive use (skip OAuth2 flow entirely)
+
+### 1.4 API Client
+
+- [ ] HTTP client that injects both auth headers on every request: `developer-token` header + `Authorization: Bearer` header
+- [ ] Auto-refresh access token if expired before making request
+- [ ] Retry logic with exponential backoff for transient errors (429 rate limit, 500/503)
+- [ ] Max 3 retries by default, configurable via `--retries` flag
+- [ ] API error mapping — parse Google Ads API error responses into human-readable messages (see SPEC.md error table)
+- [ ] `--verbose` mode — log full request/response to stderr (URL, headers with redacted tokens, body, status, timing)
+
+### 1.5 Output Formatters
+
+- [ ] Formatter interface — all commands produce structured data, formatters render it
+- [ ] **Table formatter** — aligned columns, header row, number formatting (commas, decimals), currency symbols, percentage formatting, terminal width detection, truncation with `...`, color coding (green=enabled, yellow=paused, red=removed), respects `--no-color` and `NO_COLOR` env var, footer row with totals where appropriate
+- [ ] **JSON formatter** — valid JSON array of objects, snake_case field names, numbers as numbers, pretty-printed by default, `--compact` flag for single-line, metadata envelope in `--verbose` mode
+- [ ] **CSV formatter** — RFC 4180 compliant, header row, proper escaping, UTF-8, `--bom` flag for Excel compatibility, raw numbers (no formatting/currency symbols)
+
+### 1.6 GAQL Queries (Tier 2)
+
+- [ ] `gads query "<GAQL string>"` — execute inline GAQL query against configured customer ID
+- [ ] `gads query -f <file.gaql>` — read query from file
+- [ ] POST to `googleads.googleapis.com/v18/customers/{customerId}/googleAds:searchStream`
+- [ ] Parse streaming response into rows
+- [ ] Route through output formatters (`--output table|json|csv`)
+- [ ] Support `--customer-id` flag to override default
+- [ ] Useful error messages for GAQL syntax errors (pass through Google's error details)
+
+### 1.7 Raw API Escape Hatch (Tier 3)
+
+- [ ] `gads api GET <path>` — make authenticated GET request to Google Ads API
+- [ ] `gads api POST <path> -d '<json>'` — make authenticated POST with inline body
+- [ ] `gads api POST <path> -d @<file.json>` — make authenticated POST with body from file
+- [ ] `gads api POST <path>` — read body from stdin when no `-d` flag
+- [ ] Auto-replace `{customer_id}` in path with configured default
+- [ ] Auto-prepend `https://googleads.googleapis.com` if path starts with `/`
+- [ ] Pretty-print JSON response by default, `--raw` for unformatted
+- [ ] `--dry-run` flag — show full request (URL, headers, body) without sending
+- [ ] Support custom headers via `-H "key: value"`
+- [ ] Route response through output formatters when `--output` is specified
+
+### 1.8 Integration Testing
+
+- [ ] Test auth flow with mock OAuth2 server
+- [ ] Test config read/write/precedence
+- [ ] Test output formatters with sample data (table alignment, JSON validity, CSV escaping)
+- [ ] Test `gads api` request construction (header injection, path substitution, dry-run output)
+- [ ] Test error handling and retry logic with mock API responses
+
+---
+
+## Phase 2 — Named Commands (Convenience)
+
+These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) or the mutate API (for writes). They add nice flags, validation, and formatted output.
+
+### 2.1 Campaigns
+
+- [ ] `gads campaigns list` — list all campaigns with ID, name, status, budget, basic metrics
+- [ ] `gads campaigns list --status <ENABLED|PAUSED|REMOVED>` — filter by status
+- [ ] `gads campaigns get <campaign-id>` — detailed view of a single campaign
+- [ ] `gads campaigns pause <campaign-id>` — set campaign status to PAUSED
+- [ ] `gads campaigns enable <campaign-id>` — set campaign status to ENABLED
+- [ ] `gads campaigns stats <campaign-id> --date-range <range>` — performance metrics with date range support
+- [ ] `gads campaigns stats <campaign-id> --from <date> --to <date>` — custom date range
+
+### 2.2 Ad Groups
+
+- [ ] `gads ad-groups list --campaign <campaign-id>` — list ad groups in a campaign
+- [ ] `gads ad-groups get <ad-group-id>` — detailed view
+- [ ] `gads ad-groups pause <ad-group-id>` — pause
+- [ ] `gads ad-groups enable <ad-group-id>` — enable
+- [ ] `gads ad-groups stats <ad-group-id> --date-range <range>` — performance metrics
+
+### 2.3 Ads
+
+- [ ] `gads ads list --campaign <campaign-id>` — list ads in a campaign
+- [ ] `gads ads list --ad-group <ad-group-id>` — list ads in an ad group
+- [ ] `gads ads get <ad-id>` — detailed view
+- [ ] `gads ads pause <ad-id>` — pause
+- [ ] `gads ads enable <ad-id>` — enable
+
+### 2.4 Keywords
+
+- [ ] `gads keywords list --campaign <campaign-id>` — list keywords
+- [ ] `gads keywords list --ad-group <ad-group-id>` — list keywords in ad group
+- [ ] `gads keywords get <keyword-id>` — detailed view
+- [ ] `gads keywords pause <keyword-id>` — pause
+- [ ] `gads keywords enable <keyword-id>` — enable
+- [ ] `gads keywords add --ad-group <id> --text "<keyword>" --match-type <BROAD|PHRASE|EXACT>` — add a keyword
+
+### 2.5 Budgets
+
+- [ ] `gads budgets list` — list all budgets
+- [ ] `gads budgets get <budget-id>` — detailed view
+- [ ] `gads budgets set <budget-id> --amount <amount>` — update daily budget amount
+
+### 2.6 Account
+
+- [ ] `gads account info` — current account details
+- [ ] `gads account customers` — list accessible customer accounts (useful for MCC)
+- [ ] `gads account switch <customer-id>` — update default customer ID in config
+
+---
+
+## Phase 3 — Distribution
+
+### 3.1 Install Scripts
+
+- [ ] `install.sh` — detect OS/arch, download correct binary from GitHub Releases, verify SHA256 checksum, install to `~/.local/bin/gads` (or `/usr/local/bin` with sudo), print version + next steps
+- [ ] `install.ps1` — PowerShell equivalent for Windows
+- [ ] Handle private repo auth (GitHub PAT in header or public release repo)
+
+### 3.2 CI/CD
+
+- [ ] `.github/workflows/release.yml` — trigger on `v*` tags
+- [ ] Cross-compile for: `linux/amd64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`
+- [ ] Generate SHA256 checksums file
+- [ ] Create GitHub Release with all binaries + checksums
+- [ ] Version embedding via `-ldflags "-X main.version=$TAG"`
+
+### 3.3 Self-Update
+
+- [ ] `gads update` — check latest release, download new binary, replace self
+- [ ] Show current vs latest version before updating
+- [ ] Verify checksum of downloaded binary
+
+---
+
+## Phase 4 — Schema & Intelligence
+
+### 4.1 Schema Embedding
+
+- [ ] `gen/proto_fetch.sh` — script to pull proto definitions from `googleapis/googleapis`
+- [ ] `gen/codegen.go` — parse protos, extract resource/field metadata
+- [ ] Embed metadata into binary at build time (Go `embed` package)
+
+### 4.2 Schema Command
+
+- [ ] `gads schema <resource>` — show all fields for a resource with types
+- [ ] `gads schema <resource> --selectable` — only fields usable in GAQL SELECT
+- [ ] `gads schema <resource> --filterable` — only fields usable in GAQL WHERE
+- [ ] `gads schema --live <resource>` — fetch from `GoogleAdsFieldService` instead of embedded data
+
+### 4.3 Validation & Completion
+
+- [ ] GAQL query validation — check field names and resource compatibility before sending to API
+- [ ] Shell completions for bash, zsh, fish, PowerShell (Cobra built-in + custom field completions)
+
+---
+
+## Phase 5 — Polish
+
+### 5.1 Saved Queries
+
+- [ ] `gads query save <name> -f <file.gaql>` — save a query to config dir
+- [ ] `gads query save <name> "<GAQL string>"` — save inline query
+- [ ] `gads query run <name>` — execute a saved query
+- [ ] `gads query saved` — list all saved queries
+
+### 5.2 Multi-Profile
+
+- [ ] `--profile <name>` flag on all commands — use named profile from config
+- [ ] Profile inherits base config, overrides specific values (customer_id, etc.)
+
+### 5.3 UX Polish
+
+- [ ] Terminal width detection for table column sizing
+- [ ] Color coding for campaign/ad/keyword statuses
+- [ ] `--verbose` debug output on all commands
+- [ ] Man page generation (Cobra built-in)
+- [ ] Help text polish — examples in every command's `--help`
+
+---
+
+## Constraints
+
+- **Language:** Go (latest stable)
+- **No runtime dependencies** — single static binary per platform
+- **Config location:** `~/.gads/` (config.yaml, credentials.json, token_cache.json, saved queries)
+- **Auth:** Developer token (static, shared) + OAuth2 (per-user refresh token)
+- **API protocol:** REST/JSON (not gRPC) for simplicity
+- **API version:** v18 (confirm before starting)
+- **All output:** stdout for data, stderr for logs/errors/progress
+- **Exit codes:** 0 = success, 1 = general error, 2 = auth error, 3 = API error
