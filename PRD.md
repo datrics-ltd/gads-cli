@@ -159,9 +159,9 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 3.3 Self-Update
 
-- [ ] `gads update` — check latest release, download new binary, replace self
-- [ ] Show current vs latest version before updating
-- [ ] Verify checksum of downloaded binary
+- [x] `gads update` — check latest release, download new binary, replace self
+- [x] Show current vs latest version before updating
+- [x] Verify checksum of downloaded binary
 
 ---
 

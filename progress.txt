@@ -202,6 +202,15 @@
   - Creates GitHub Release via `softprops/action-gh-release@v2` with all binaries + checksums
   - `generate_release_notes: true` auto-generates notes from commit history
 
+### 2026-03-18 — Phase 3.3 Self-Update
+- `cmd/update.go` — NEW: `gads update` command
+  - Fetches latest release tag from GitHub API (`/repos/{owner}/{repo}/releases/latest`)
+  - Compares current version (from rootCmd.Version) against latest tag; exits early if already up to date
+  - Detects platform binary name from `runtime.GOOS` + `runtime.GOARCH` (e.g. `gads-linux-amd64`)
+  - Downloads binary via asset API URL (with `Authorization: token` + `Accept: application/octet-stream` when `GITHUB_TOKEN` is set) or `browser_download_url` for public repos
+  - Verifies SHA256 checksum against `checksums.txt` release asset
+  - Atomically replaces the running binary: writes to a temp file in the same directory, then `os.Rename()` (preserves original file permissions)
+
 ## In Progress
 (none)
 
