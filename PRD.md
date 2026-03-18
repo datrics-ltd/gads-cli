@@ -175,10 +175,10 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 4.2 Schema Command
 
-- [ ] `gads schema <resource>` — show all fields for a resource with types
-- [ ] `gads schema <resource> --selectable` — only fields usable in GAQL SELECT
-- [ ] `gads schema <resource> --filterable` — only fields usable in GAQL WHERE
-- [ ] `gads schema --live <resource>` — fetch from `GoogleAdsFieldService` instead of embedded data
+- [x] `gads schema <resource>` — show all fields for a resource with types
+- [x] `gads schema <resource> --selectable` — only fields usable in GAQL SELECT
+- [x] `gads schema <resource> --filterable` — only fields usable in GAQL WHERE
+- [x] `gads schema --live <resource>` — fetch from `GoogleAdsFieldService` instead of embedded data
 
 ### 4.3 Validation & Completion
 

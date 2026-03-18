@@ -236,6 +236,14 @@
   - All fields include selectable/filterable/sortable/is_repeated booleans and descriptions
   - ENUM fields include enum_values arrays
 
+### 2026-03-18 — Phase 4.2 Schema Command
+- `cmd/schema.go` — NEW: `gads schema` command
+  - `gads schema` (no args): lists all resources in embedded schema with API version/date header
+  - `gads schema <resource>`: shows all fields (name, type, category, selectable, filterable, sortable, description) via output formatters (table/json/csv)
+  - `--selectable` flag: filters to only GAQL SELECT-compatible fields
+  - `--filterable` flag: filters to only GAQL WHERE-compatible fields
+  - `--live` flag: fetches live field metadata from `GoogleAdsFieldService` (`POST /v18/googleAdsFields:search`) instead of embedded schema; sorts by field name for consistent output
+
 ## In Progress
 (none)
 
