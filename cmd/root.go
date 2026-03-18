@@ -52,6 +52,7 @@ func init() {
 	pf.BoolP("verbose", "v", false, "Show debug output (API requests/responses)")
 	pf.BoolP("quiet", "q", false, "Suppress all non-data output")
 	pf.Bool("no-color", false, "Disable colored output")
+	pf.Int("retries", 3, "Maximum number of retries for transient API errors")
 
 	// Bind flags to viper
 	mustBind("customer_id", "customer-id")
@@ -60,6 +61,7 @@ func init() {
 	mustBind("verbose", "verbose")
 	mustBind("quiet", "quiet")
 	mustBind("no_color", "no-color")
+	mustBind("retries", "retries")
 
 	// Env var prefix: GADS_
 	viper.SetEnvPrefix("GADS")

@@ -41,12 +41,12 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.4 API Client
 
-- [ ] HTTP client that injects both auth headers on every request: `developer-token` header + `Authorization: Bearer` header
-- [ ] Auto-refresh access token if expired before making request
-- [ ] Retry logic with exponential backoff for transient errors (429 rate limit, 500/503)
-- [ ] Max 3 retries by default, configurable via `--retries` flag
-- [ ] API error mapping — parse Google Ads API error responses into human-readable messages (see SPEC.md error table)
-- [ ] `--verbose` mode — log full request/response to stderr (URL, headers with redacted tokens, body, status, timing)
+- [x] HTTP client that injects both auth headers on every request: `developer-token` header + `Authorization: Bearer` header
+- [x] Auto-refresh access token if expired before making request
+- [x] Retry logic with exponential backoff for transient errors (429 rate limit, 500/503)
+- [x] Max 3 retries by default, configurable via `--retries` flag
+- [x] API error mapping — parse Google Ads API error responses into human-readable messages (see SPEC.md error table)
+- [x] `--verbose` mode — log full request/response to stderr (URL, headers with redacted tokens, body, status, timing)
 
 ### 1.5 Output Formatters
 

@@ -39,6 +39,21 @@
   - `refresh`: calls auth.ForceRefresh(), shows confirmation (debug token preview with --verbose)
 - Dependencies added: `golang.org/x/oauth2`, `golang.org/x/oauth2/google`, `github.com/pkg/browser`
 
+### 2026-03-18 — Phase 1.4 API Client
+- `internal/api/client.go` — REWRITTEN: full HTTP client implementation
+  - `Client` struct with `TokenSource` interface, developer token, customer ID, retries, verbose
+  - `NewClient(Config)` — config struct pattern for clean construction
+  - `Do(*http.Request)` — executes request with body replay on retry, auth header injection, verbose logging
+  - `Get(path, headers)` / `Post(path, body, headers)` — convenience methods
+  - `injectAuthHeaders()` — injects `developer-token` + `Authorization: Bearer` headers; auto-refreshes via TokenSource
+  - Retry loop with exponential backoff (1s, 2s, 4s) for 429/500/503 responses
+  - Verbose mode logs full request (method, URL, headers with redaction, body) and response (status, timing) to stderr
+- `internal/api/errors.go` — NEW: API error parsing and mapping
+  - `ParseAPIError(*http.Response)` — parses Google Ads REST error envelope into `APIError`
+  - Maps known error types (AUTHENTICATION_ERROR, AUTHORIZATION_ERROR, QUOTA_ERROR, QUERY_ERROR, REQUEST_ERROR) to human-readable messages
+  - Falls back to HTTP status mapping for unstructured errors
+- `cmd/root.go` — added `--retries` flag (default 3), bound to viper key `retries`
+
 ## In Progress
 (none)
 
