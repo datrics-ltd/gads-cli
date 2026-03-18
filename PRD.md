@@ -104,11 +104,11 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 2.2 Ad Groups
 
-- [ ] `gads ad-groups list --campaign <campaign-id>` — list ad groups in a campaign
-- [ ] `gads ad-groups get <ad-group-id>` — detailed view
-- [ ] `gads ad-groups pause <ad-group-id>` — pause
-- [ ] `gads ad-groups enable <ad-group-id>` — enable
-- [ ] `gads ad-groups stats <ad-group-id> --date-range <range>` — performance metrics
+- [x] `gads ad-groups list --campaign <campaign-id>` — list ad groups in a campaign
+- [x] `gads ad-groups get <ad-group-id>` — detailed view
+- [x] `gads ad-groups pause <ad-group-id>` — pause
+- [x] `gads ad-groups enable <ad-group-id>` — enable
+- [x] `gads ad-groups stats <ad-group-id> --date-range <range>` — performance metrics
 
 ### 2.3 Ads
 

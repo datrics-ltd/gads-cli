@@ -121,6 +121,14 @@
 - `cmd/helpers.go` — UPDATED: added shared `renderOutput()` helper (format + options from viper, writes to stdout)
 - `cmd/query.go` — UPDATED: refactored to use shared `renderOutput()` helper
 
+### 2026-03-18 — Phase 2.2 Ad Groups
+- `cmd/ad_groups.go` — NEW: `gads ad-groups` command with five subcommands
+  - `list`: GAQL query against `ad_group` resource; shows ID, name, status, campaign ID, campaign name, clicks, impressions, cost, CTR; `--campaign` flag filters by campaign ID
+  - `get <ad-group-id>`: GAQL lookup by ad_group.id; shows same fields plus type and conversions
+  - `pause <ad-group-id>`: POST to `adGroups:mutate` with `updateMask=status`, sets status to PAUSED
+  - `enable <ad-group-id>`: same mutate pattern, sets status to ENABLED
+  - `stats <ad-group-id>`: GAQL with date filter; `--date-range` for presets (LAST_7_DAYS default), `--from`/`--to` for custom BETWEEN range; shows clicks, impressions, cost, CTR, conversions, conversion_rate, average_cpc
+
 ## In Progress
 (none)
 
