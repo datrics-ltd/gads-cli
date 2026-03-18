@@ -120,12 +120,12 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 2.4 Keywords
 
-- [ ] `gads keywords list --campaign <campaign-id>` — list keywords
-- [ ] `gads keywords list --ad-group <ad-group-id>` — list keywords in ad group
-- [ ] `gads keywords get <keyword-id>` — detailed view
-- [ ] `gads keywords pause <keyword-id>` — pause
-- [ ] `gads keywords enable <keyword-id>` — enable
-- [ ] `gads keywords add --ad-group <id> --text "<keyword>" --match-type <BROAD|PHRASE|EXACT>` — add a keyword
+- [x] `gads keywords list --campaign <campaign-id>` — list keywords
+- [x] `gads keywords list --ad-group <ad-group-id>` — list keywords in ad group
+- [x] `gads keywords get <keyword-id>` — detailed view
+- [x] `gads keywords pause <keyword-id>` — pause
+- [x] `gads keywords enable <keyword-id>` — enable
+- [x] `gads keywords add --ad-group <id> --text "<keyword>" --match-type <BROAD|PHRASE|EXACT>` — add a keyword
 
 ### 2.5 Budgets
 

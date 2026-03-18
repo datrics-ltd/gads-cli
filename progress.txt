@@ -136,6 +136,14 @@
   - `pause <ad-id>`: looks up resource name via GAQL, then POSTs to `adGroupAds:mutate` with `updateMask=status`, sets status to PAUSED
   - `enable <ad-id>`: same mutate pattern, sets status to ENABLED
 
+### 2026-03-18 — Phase 2.4 Keywords
+- `cmd/keywords.go` — NEW: `gads keywords` command with five subcommands
+  - `list`: GAQL query against `keyword_view` resource; shows criterion ID, keyword text, match type, status, ad group ID/name, campaign ID/name, clicks, impressions, cost, CTR; `--campaign` flag filters by campaign ID, `--ad-group` flag filters by ad group ID
+  - `get <keyword-id>`: GAQL lookup by `ad_group_criterion.criterion_id`; shows same fields plus quality score, conversions, and average CPC
+  - `pause <keyword-id>`: looks up resource name via GAQL, then POSTs to `adGroupCriteria:mutate` with `updateMask=status`, sets status to PAUSED
+  - `enable <keyword-id>`: same mutate pattern, sets status to ENABLED
+  - `add --ad-group <id> --text "<keyword>" --match-type <BROAD|PHRASE|EXACT>`: POSTs create operation to `adGroupCriteria:mutate`
+
 ## In Progress
 (none)
 
