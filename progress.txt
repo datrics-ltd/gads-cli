@@ -156,6 +156,18 @@
   - `customers`: GET `/v18/customers:listAccessibleCustomers`; shows customer_id and resource_name for all accessible accounts (useful for MCC)
   - `switch <customer-id>`: updates `default_customer_id` in `~/.gads/config.yaml`; confirms on stderr unless --quiet
 
+### 2026-03-18 — Phase 3.1 Install Script (install.sh)
+- `install.sh` — NEW: Unix install script
+  - Detects OS (`uname -s`: linux, darwin, windows/MINGW) and architecture (`uname -m`: amd64, arm64)
+  - Maps to binary filename: `gads-{os}-{arch}` (e.g. `gads-darwin-arm64`, `gads-linux-amd64`)
+  - Fetches latest release tag from GitHub API (`/repos/{owner}/{repo}/releases/latest`) — no jq required, pure sed parsing
+  - Downloads binary via curl or wget (whichever is available)
+  - Downloads `checksums.txt` and verifies SHA256 via `sha256sum` or `shasum -a 256`; gracefully skips if neither tool nor checksum file present
+  - Installs to `~/.local/bin/gads` (non-root) or `/usr/local/bin/gads` (root); overridable via `GADS_INSTALL_DIR` env var
+  - Warns if install dir is not in PATH and prints the export line to add
+  - Prints next-steps guide (config set, auth login)
+  - Script marked executable (`chmod +x install.sh`)
+
 ## In Progress
 (none)
 
