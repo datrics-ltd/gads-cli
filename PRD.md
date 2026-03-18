@@ -67,16 +67,16 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.7 Raw API Escape Hatch (Tier 3)
 
-- [ ] `gads api GET <path>` — make authenticated GET request to Google Ads API
-- [ ] `gads api POST <path> -d '<json>'` — make authenticated POST with inline body
-- [ ] `gads api POST <path> -d @<file.json>` — make authenticated POST with body from file
-- [ ] `gads api POST <path>` — read body from stdin when no `-d` flag
-- [ ] Auto-replace `{customer_id}` in path with configured default
-- [ ] Auto-prepend `https://googleads.googleapis.com` if path starts with `/`
-- [ ] Pretty-print JSON response by default, `--raw` for unformatted
-- [ ] `--dry-run` flag — show full request (URL, headers, body) without sending
-- [ ] Support custom headers via `-H "key: value"`
-- [ ] Route response through output formatters when `--output` is specified
+- [x] `gads api GET <path>` — make authenticated GET request to Google Ads API
+- [x] `gads api POST <path> -d '<json>'` — make authenticated POST with inline body
+- [x] `gads api POST <path> -d @<file.json>` — make authenticated POST with body from file
+- [x] `gads api POST <path>` — read body from stdin when no `-d` flag
+- [x] Auto-replace `{customer_id}` in path with configured default
+- [x] Auto-prepend `https://googleads.googleapis.com` if path starts with `/`
+- [x] Pretty-print JSON response by default, `--raw` for unformatted
+- [x] `--dry-run` flag — show full request (URL, headers, body) without sending
+- [x] Support custom headers via `-H "key: value"`
+- [x] Route response through output formatters when `--output` is specified
 
 ### 1.8 Integration Testing
 

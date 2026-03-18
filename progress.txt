@@ -88,6 +88,19 @@
   - Routes results through output formatters (`--output table|json|csv`)
   - `--customer-id` flag (global) overrides default; GAQL syntax errors pass through from API
 
+### 2026-03-18 — Phase 1.7 Raw API Escape Hatch (Tier 3)
+- `cmd/api.go` — NEW: `gads api GET|POST <path>` command
+  - `GET <path>`: authenticated GET request to Google Ads API
+  - `POST <path> -d '<json>'`: POST with inline JSON body
+  - `POST <path> -d @<file.json>`: POST with body read from file
+  - `POST <path>`: reads body from stdin when no `-d` flag
+  - Auto-replaces `{customer_id}` with configured customer ID (dashes stripped)
+  - Auto-prepends `https://googleads.googleapis.com` when path starts with `/`
+  - Pretty-prints JSON response by default; `--raw` flag for unformatted output
+  - `--dry-run` flag shows full request (URL, headers with redaction, body) without sending
+  - `-H "Key: Value"` flag for custom headers (repeatable)
+  - Routes response through output formatters when `--output json|csv` explicitly set
+
 ## In Progress
 (none)
 
