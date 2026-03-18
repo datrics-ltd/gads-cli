@@ -12,12 +12,12 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.1 Project Scaffolding
 
-- [ ] Initialize Go module (`github.com/datrics-ltd/gads-cli`)
-- [ ] Set up Cobra root command with global flags (`--customer-id`, `--output`, `--profile`, `--verbose`, `--quiet`, `--no-color`)
-- [ ] Set up Viper config integration (config file + env vars + flag binding)
-- [ ] Create directory structure: `cmd/`, `internal/api/`, `internal/auth/`, `internal/config/`, `internal/output/`
-- [ ] Add `version` command with build-time version injection via `-ldflags`
-- [ ] Add `.gitignore` for Go project
+- [x] Initialize Go module (`github.com/datrics-ltd/gads-cli`)
+- [x] Set up Cobra root command with global flags (`--customer-id`, `--output`, `--profile`, `--verbose`, `--quiet`, `--no-color`)
+- [x] Set up Viper config integration (config file + env vars + flag binding)
+- [x] Create directory structure: `cmd/`, `internal/api/`, `internal/auth/`, `internal/config/`, `internal/output/`
+- [x] Add `version` command with build-time version injection via `-ldflags`
+- [x] Add `.gitignore` for Go project
 
 ### 1.2 Configuration
 

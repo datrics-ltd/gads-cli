@@ -1,0 +1,47 @@
+# Binaries
+gads
+gads-linux-*
+gads-darwin-*
+gads-windows-*
+*.exe
+
+# Go build artifacts
+/dist/
+/bin/
+
+# Go module cache and vendor directory
+vendor/
+
+# Test output
+*.test
+*.out
+
+# Coverage reports
+coverage.html
+coverage.txt
+
+# Profiling
+*.prof
+*.pprof
+
+# Environment / secrets (never commit credentials)
+.env
+.env.*
+*.env
+credentials.json
+token_cache.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# GoReleaser
+dist/
+
+# Build temp
+/tmp/

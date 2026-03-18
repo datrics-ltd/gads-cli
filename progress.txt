@@ -1,10 +1,22 @@
 # gads-cli Progress
 
 ## Completed
-(none yet)
+
+### 2026-03-18 — Phase 1.1 Project Scaffolding
+- Initialized Go module `github.com/datrics-ltd/gads-cli` (Go 1.24.1)
+- Created directory structure: `cmd/`, `internal/api/`, `internal/auth/`, `internal/config/`, `internal/output/`
+- `main.go` — entry point with `var version = "dev"` injectable via `-ldflags`
+- `cmd/root.go` — Cobra root command with global flags: `--customer-id/-c`, `--output/-o`, `--profile/-p`, `--verbose/-v`, `--quiet/-q`, `--no-color`; Viper binding with `GADS_` env prefix
+- `cmd/version.go` — `gads version` subcommand
+- `internal/config/config.go` — Viper config loading `~/.gads/config.yaml`, auto-creates dir, binds all GADS_ env vars
+- `internal/api/client.go` — placeholder Client struct
+- `internal/auth/oauth.go` — placeholder TokenSource interface and Credentials struct
+- `internal/output/formatter.go` — Formatter interface, Format type, ParseFormat
+- `.gitignore` — standard Go gitignore
 
 ## In Progress
-(none yet)
+(none)
 
 ## Notes
-(none yet)
+- Go installed at `/home/cm/.local/go`
+- Build: `/home/cm/.local/go/bin/go build ./...`
