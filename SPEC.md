@@ -4,21 +4,27 @@
 
 A cross-platform CLI for the Google Ads API, built in Go. Distributed as single binaries for Linux, macOS, and Windows. Designed for both human operators (formatted tables) and automation/AI agents (JSON, CSV output).
 
+**End goal:** A CLI + accompanying OpenClaw skill so AI agents can interact with Google Ads conversationally.
+
 ---
 
 ## Table of Contents
 
 1. [Architecture](#architecture)
-2. [Authentication](#authentication)
-3. [Configuration](#configuration)
-4. [Commands](#commands)
-5. [Output Formatting](#output-formatting)
-6. [Error Handling](#error-handling)
-7. [Distribution & Installation](#distribution--installation)
-8. [CI/CD](#cicd)
-9. [Project Structure](#project-structure)
-10. [Dependencies](#dependencies)
-11. [Implementation Phases](#implementation-phases)
+2. [Three-Tier Command Model](#three-tier-command-model)
+3. [Authentication](#authentication)
+4. [Configuration](#configuration)
+5. [Commands](#commands)
+6. [Output Formatting](#output-formatting)
+7. [Error Handling](#error-handling)
+8. [API Schema & Code Generation](#api-schema--code-generation)
+9. [Distribution & Installation](#distribution--installation)
+10. [CI/CD](#cicd)
+11. [Project Structure](#project-structure)
+12. [Dependencies](#dependencies)
+13. [Implementation Phases](#implementation-phases)
+14. [OpenClaw Skill](#openclaw-skill)
+15. [Open Questions](#open-questions)
 
 ---
 
@@ -40,13 +46,73 @@ A cross-platform CLI for the Google Ads API, built in Go. Distributed as single 
 
 ---
 
+## Three-Tier Command Model
+
+The CLI exposes the Google Ads API at three levels of abstraction. This ensures we're never blocked — the named commands cover common operations, GAQL covers all reads, and `gads api` covers 100% of the API surface.
+
+### Tier 1 — Named Commands (Ergonomic)
+
+Hand-crafted commands for the ~15-20 most common operations. These are the convenience layer — nice flags, human-readable output, validation.
+
+```bash
+gads campaigns list --status ENABLED
+gads campaigns pause 12345
+gads budgets set 67890 --amount 75.00
+gads keywords add --ad-group 123 --text "running shoes" --match-type BROAD
+```
+
+### Tier 2 — GAQL Queries (All Reads)
+
+Arbitrary Google Ads Query Language queries. Covers **100% of readable data** — every resource, metric, and segment in the API.
+
+```bash
+gads query "SELECT campaign.name, metrics.clicks FROM campaign WHERE segments.date DURING LAST_7_DAYS"
+gads query -f ./queries/weekly-spend.gaql --output csv > report.csv
+```
+
+### Tier 3 — Raw API (Escape Hatch)
+
+Direct HTTP calls to any Google Ads API endpoint. Handles auth headers automatically. Covers **100% of the API** — reads AND writes. For anything the named commands don't wrap yet.
+
+```bash
+# GET a specific resource
+gads api GET /v18/customers/123456/campaigns/789
+
+# POST a mutation
+gads api POST /v18/customers/123456/campaigns:mutate -d '{"operations": [...]}'
+
+# From file
+gads api POST /v18/customers/123456/adGroups:mutate -d @payload.json
+
+# Pipe-friendly
+cat mutation.json | gads api POST /v18/customers/123456/campaigns:mutate
+```
+
+The `gads api` command:
+- Automatically injects `developer-token` and `Authorization: Bearer` headers
+- Substitutes `{customer_id}` with the configured default if present in the path
+- Pretty-prints JSON responses by default, `--raw` for unformatted
+- Respects `--output` flag for response formatting
+- Supports `--dry-run` to show the full request without sending it
+
+### How This Serves AI Agents
+
+For the OpenClaw skill:
+- **Tier 1** for common tasks the agent handles regularly (check campaign status, pause/enable)
+- **Tier 2** for any data retrieval — the agent constructs GAQL queries on the fly
+- **Tier 3** for mutations the named commands don't cover — the agent reads the API schema and constructs the right `gads api` call
+
+An agent is never blocked by "this command doesn't exist yet."
+
+---
+
 ## Authentication
 
 Google Ads API requires **two layers** of auth on every request:
 
 ### 1. Developer Token (Static)
 
-- Issued by Google after API access approval
+- Issued by Google after API access approval (this is the special approved access — separate from OAuth2)
 - Tied to the Manager (MCC) account
 - Sent as `developer-token` header on every API request
 - Stored in config file — shared across the team
@@ -184,7 +250,9 @@ Flag > Env var > Config file > Default
 
 ## Commands
 
-### Campaigns
+### Tier 1 — Named Commands
+
+#### Campaigns
 
 ```bash
 # List all campaigns
@@ -205,7 +273,7 @@ gads campaigns stats <campaign-id> --date-range LAST_7_DAYS
 gads campaigns stats <campaign-id> --from 2026-03-01 --to 2026-03-18
 ```
 
-#### campaigns list — Table Output
+##### campaigns list — Table Output
 
 ```
 ID           NAME                    STATUS    BUDGET/DAY   CLICKS   IMPR     COST      CTR
@@ -214,7 +282,7 @@ ID           NAME                    STATUS    BUDGET/DAY   CLICKS   IMPR     CO
 12345678903  Remarketing - Shopping  ENABLED   €100.00      3,456    89,012   €2,345.67 3.88%
 ```
 
-### Ad Groups
+#### Ad Groups
 
 ```bash
 gads ad-groups list --campaign <campaign-id>
@@ -224,7 +292,7 @@ gads ad-groups enable <ad-group-id>
 gads ad-groups stats <ad-group-id> --date-range LAST_30_DAYS
 ```
 
-### Ads
+#### Ads
 
 ```bash
 gads ads list --campaign <campaign-id>
@@ -234,7 +302,7 @@ gads ads pause <ad-id>
 gads ads enable <ad-id>
 ```
 
-### Keywords
+#### Keywords
 
 ```bash
 gads keywords list --campaign <campaign-id>
@@ -245,26 +313,40 @@ gads keywords enable <keyword-id>
 gads keywords add --ad-group <ad-group-id> --text "running shoes" --match-type BROAD
 ```
 
-### Reports / GAQL Queries
+#### Budgets
 
-The power feature — run arbitrary Google Ads Query Language (GAQL) queries:
+```bash
+gads budgets list
+gads budgets get <budget-id>
+gads budgets set <budget-id> --amount 75.00
+```
+
+#### Account
+
+```bash
+gads account info                    # Current account details
+gads account customers               # List accessible customer accounts
+gads account switch <customer-id>    # Change default customer ID
+```
+
+### Tier 2 — GAQL Queries
 
 ```bash
 # Inline query
-gads reports query "SELECT campaign.name, metrics.clicks, metrics.impressions FROM campaign WHERE segments.date DURING LAST_7_DAYS"
+gads query "SELECT campaign.name, metrics.clicks, metrics.impressions FROM campaign WHERE segments.date DURING LAST_7_DAYS"
 
 # Query from file
-gads reports query -f ./queries/weekly-spend.gaql
+gads query -f ./queries/weekly-spend.gaql
 
 # With output formatting
-gads reports query -f ./queries/weekly-spend.gaql --output csv > report.csv
-gads reports query -f ./queries/weekly-spend.gaql --output json | jq '.[].metrics.clicks'
+gads query -f ./queries/weekly-spend.gaql --output csv > report.csv
+gads query -f ./queries/weekly-spend.gaql --output json | jq '.[].metrics.clicks'
 
-# Saved queries (stored in config)
-gads reports save weekly-spend -f ./queries/weekly-spend.gaql
-gads reports run weekly-spend
-gads reports run weekly-spend --output csv
-gads reports saved  # List saved queries
+# Saved queries (stored in config dir)
+gads query save weekly-spend -f ./queries/weekly-spend.gaql
+gads query run weekly-spend
+gads query run weekly-spend --output csv
+gads query saved  # List saved queries
 ```
 
 #### GAQL Query Output — Table
@@ -278,20 +360,45 @@ Generic - Display     567      123,456       €234.56    0.46%   €0.41
 TOTAL                 5,257    258,146       €3,472.57  2.04%   €0.66
 ```
 
-### Account
+### Tier 3 — Raw API
 
 ```bash
-gads account info                    # Current account details
-gads account customers               # List accessible customer accounts
-gads account switch <customer-id>    # Change default customer ID
+# GET requests
+gads api GET /v18/customers/{customer_id}/campaigns/789
+gads api GET /v18/customers/{customer_id}/adGroups/456
+
+# POST mutations
+gads api POST /v18/customers/{customer_id}/campaigns:mutate -d '{"operations": [{"update": {...}, "updateMask": "status"}]}'
+
+# From file
+gads api POST /v18/customers/{customer_id}/adGroups:mutate -d @payload.json
+
+# Stdin
+cat mutation.json | gads api POST /v18/customers/{customer_id}/campaigns:mutate
+
+# Dry run — show request without sending
+gads api POST /v18/customers/{customer_id}/campaigns:mutate -d @payload.json --dry-run
+
+# Custom headers
+gads api GET /v18/customers/{customer_id}/campaigns -H "x-custom: value"
+
+# Override API version
+gads api GET /v19/customers/{customer_id}/campaigns --api-version v19
 ```
 
-### Budgets
+`{customer_id}` is auto-replaced with the configured default. Override with `--customer-id`.
+
+### Utility Commands
 
 ```bash
-gads budgets list
-gads budgets get <budget-id>
-gads budgets set <budget-id> --amount 75.00
+gads auth login|status|logout|refresh   # Authentication
+gads config set|get|list|path           # Configuration
+gads version                            # Print version
+gads update                             # Self-update to latest
+gads schema <resource>                  # Show fields/schema for a resource (from embedded metadata)
+gads schema campaign                    # List all fields for campaign resource
+gads schema campaign --selectable       # Only selectable fields
+gads schema campaign --filterable       # Only filterable fields
 ```
 
 ---
@@ -389,6 +496,51 @@ Map Google Ads API error codes to human-readable messages:
 [DEBUG] Request body: {"query": "SELECT ..."}
 [DEBUG] Response: 200 OK (234ms)
 ```
+
+---
+
+## API Schema & Code Generation
+
+### Source of Truth
+
+The Google Ads API schema is defined in protobuf files at:
+
+**[googleapis/googleapis](https://github.com/googleapis/googleapis/tree/master/google/ads/googleads)** on GitHub
+
+This contains every resource, field, enum, service, and mutate operation — all machine-readable.
+
+### How We Use It
+
+#### At Build Time
+
+1. **Pull proto definitions** from `googleapis/googleapis` for the target API version
+2. **Code-generate** the Tier 1 named commands from the proto service definitions — each `XxxService.MutateXxx` RPC becomes a mutation command, each resource becomes a `list`/`get` subcommand
+3. **Embed field metadata** into the binary — used by `gads schema` command and for GAQL query validation/autocomplete
+
+#### At Runtime
+
+1. **`gads schema <resource>`** — queries the embedded metadata to show available fields, types, selectability, filterability. Useful for humans writing GAQL and for agents constructing queries.
+2. **GAQL validation** — before sending a query, validate field names and resource compatibility locally. Fail fast with a helpful error instead of hitting the API.
+3. **Shell completions** — use embedded metadata to autocomplete resource names, field names, enum values.
+
+#### GoogleAdsFieldService (Supplementary)
+
+The API exposes `GoogleAdsFieldService.SearchGoogleAdsFields` which returns live field metadata. Useful for:
+- Refreshing local metadata without rebuilding
+- `gads schema --live <resource>` to fetch from API directly
+- Verifying embedded metadata matches the live API
+
+### Schema Update Process
+
+When Google releases a new API version:
+
+1. Update the proto source reference in the build script
+2. Re-run code generation
+3. Review generated diffs — new resources, deprecated fields, breaking changes
+4. Update API version constant
+5. Tag new release
+
+This keeps the CLI in sync with the API with minimal manual effort.
 
 ---
 
@@ -527,20 +679,23 @@ gads-cli/
 ├── cmd/
 │   ├── root.go              # Root command, global flags
 │   ├── auth.go              # auth login|status|logout|refresh
-│   ├── config.go            # config set|get|list|path
+│   ├── config_cmd.go        # config set|get|list|path
 │   ├── campaigns.go         # campaigns list|get|pause|enable|stats
 │   ├── ad_groups.go         # ad-groups list|get|pause|enable|stats
 │   ├── ads.go               # ads list|get|pause|enable
 │   ├── keywords.go          # keywords list|get|pause|enable|add
-│   ├── reports.go           # reports query|save|run|saved
+│   ├── query.go             # query (GAQL) + query save|run|saved
+│   ├── api.go               # api GET|POST (raw escape hatch)
 │   ├── budgets.go           # budgets list|get|set
 │   ├── account.go           # account info|customers|switch
+│   ├── schema.go            # schema <resource> (field metadata)
 │   ├── update.go            # update (self-update)
 │   └── version.go           # version
 ├── internal/
 │   ├── api/
 │   │   ├── client.go        # HTTP client, auth headers, retry logic
-│   │   ├── gaql.go          # GAQL query builder/parser
+│   │   ├── gaql.go          # GAQL query execution
+│   │   ├── raw.go           # Raw API call handler (Tier 3)
 │   │   └── errors.go        # API error mapping
 │   ├── auth/
 │   │   ├── oauth.go         # OAuth2 flow (browser + local server)
@@ -549,11 +704,18 @@ gads-cli/
 │   ├── config/
 │   │   ├── config.go        # Viper config management
 │   │   └── profiles.go      # Multi-profile support
-│   └── output/
-│       ├── formatter.go     # Formatter interface
-│       ├── table.go         # Table formatter
-│       ├── json.go          # JSON formatter
-│       └── csv.go           # CSV formatter
+│   ├── output/
+│   │   ├── formatter.go     # Formatter interface
+│   │   ├── table.go         # Table formatter
+│   │   ├── json.go          # JSON formatter
+│   │   └── csv.go           # CSV formatter
+│   └── schema/
+│       ├── metadata.go      # Embedded field/resource metadata
+│       ├── validate.go      # GAQL query validation
+│       └── complete.go      # Shell completion helpers
+├── gen/
+│   ├── proto_fetch.sh       # Pull proto definitions from googleapis/googleapis
+│   └── codegen.go           # Generate command scaffolding from proto definitions
 ├── install.sh               # Unix install script
 ├── install.ps1              # Windows PowerShell install script
 ├── go.mod
@@ -576,35 +738,36 @@ gads-cli/
 | `github.com/spf13/cobra` | CLI framework |
 | `github.com/spf13/viper` | Configuration management |
 | `golang.org/x/oauth2` | OAuth2 client |
-| `google.golang.org/api` | Google APIs client (or raw HTTP) |
 | `github.com/olekukonko/tablewriter` | Table formatting |
 | `github.com/fatih/color` | Terminal colors |
 | `github.com/pkg/browser` | Open browser cross-platform |
 
-Keep dependencies minimal. The Google Ads API can be called via raw HTTP + protobuf/JSON — evaluate whether the official client library adds value or just complexity.
+Raw HTTP to the Google Ads REST API — no heavy client library needed. Auth headers are simple. The API returns JSON which Go handles natively.
 
 ---
 
 ## Implementation Phases
 
-### Phase 1 — Foundation
+### Phase 1 — Foundation (MVP)
 
 - [ ] Project scaffolding (Go module, Cobra setup, directory structure)
 - [ ] Config management (`config set/get/list/path`)
 - [ ] OAuth2 auth flow (`auth login/status/logout`)
-- [ ] API client with auth headers (developer token + OAuth2)
+- [ ] API client with dual auth headers (developer token + OAuth2)
+- [ ] **`gads api` — raw escape hatch** (Tier 3 — gives 100% API coverage from day one)
+- [ ] **`gads query` — GAQL queries** (Tier 2 — gives 100% read coverage)
 - [ ] Output formatters (table, JSON, CSV)
-- [ ] `campaigns list` as the first real command
 - [ ] Error handling framework
 - [ ] `version` command
 
-### Phase 2 — Core Commands
+**After Phase 1:** The CLI can already do everything the API supports via `gads query` and `gads api`. Everything after this is convenience.
 
-- [ ] `campaigns get/pause/enable/stats`
+### Phase 2 — Named Commands (Convenience)
+
+- [ ] `campaigns list/get/pause/enable/stats`
 - [ ] `ad-groups list/get/pause/enable/stats`
 - [ ] `ads list/get/pause/enable`
 - [ ] `keywords list/get/pause/enable/add`
-- [ ] `reports query` (inline GAQL + file input)
 - [ ] `account info/customers/switch`
 - [ ] `budgets list/get/set`
 
@@ -616,16 +779,82 @@ Keep dependencies minimal. The Google Ads API can be called via raw HTTP + proto
 - [ ] `update` command (self-update)
 - [ ] Version embedding at build time
 
-### Phase 4 — Polish
+### Phase 4 — Schema & Intelligence
 
-- [ ] Saved queries (`reports save/run/saved`)
+- [ ] Embed proto-derived field metadata
+- [ ] `gads schema <resource>` command
+- [ ] GAQL query validation (local, pre-send)
+- [ ] Shell completions (bash, zsh, fish, PowerShell) with field autocomplete
+
+### Phase 5 — Polish & Skill
+
+- [ ] Saved queries (`query save/run/saved`)
 - [ ] Multi-profile support (`--profile`)
-- [ ] Shell completions (bash, zsh, fish, PowerShell)
 - [ ] `--verbose` debug output
 - [ ] Retry logic with backoff
 - [ ] Terminal width detection for table truncation
 - [ ] Color coding for statuses
-- [ ] Man page / help text polish
+- [ ] **OpenClaw skill** (see below)
+
+---
+
+## OpenClaw Skill
+
+The end goal: an OpenClaw agent skill that allows AI agents to interact with Google Ads conversationally.
+
+### Skill Design
+
+The skill tells the agent:
+1. **What `gads` can do** — the three tiers and when to use each
+2. **How auth works** — the CLI handles it, agent just needs `gads` installed and configured
+3. **Common patterns** — example commands for frequent operations
+4. **Schema reference** — how to use `gads schema` to discover fields and construct queries
+5. **Output conventions** — always use `--output json` for programmatic access, parse with `jq`
+
+### Agent Workflow
+
+```
+User: "How are our search campaigns performing this week?"
+
+Agent thinks:
+  → Use gads query with GAQL to get campaign performance
+  → Filter to SEARCH type, LAST_7_DAYS
+
+Agent runs:
+  gads query "SELECT campaign.name, campaign.status, metrics.clicks, metrics.impressions, metrics.cost_micros, metrics.conversions FROM campaign WHERE campaign.advertising_channel_type = 'SEARCH' AND segments.date DURING LAST_7_DAYS" --output json
+
+Agent formats response conversationally.
+```
+
+```
+User: "Pause the Brand - Display campaign"
+
+Agent thinks:
+  → First find the campaign ID
+  → Then pause it
+
+Agent runs:
+  gads campaigns list --status ENABLED --output json
+  # finds ID 12345
+  gads campaigns pause 12345
+```
+
+```
+User: "Create a new ad group with these keywords: ..."
+
+Agent thinks:
+  → No named command for this yet
+  → Use gads api with the mutation endpoint
+  → Check gads schema ad_group for required fields
+
+Agent runs:
+  gads schema ad_group
+  gads api POST /v18/customers/{customer_id}/adGroups:mutate -d '{"operations": [...]}'
+```
+
+### Skill File Location
+
+Once built: `~/.openclaw/workspace-lucius/skills/gads/SKILL.md` (or published to ClawHub).
 
 ---
 
@@ -636,4 +865,5 @@ Keep dependencies minimal. The Google Ads API can be called via raw HTTP + proto
 3. **Rate limiting** — What's our quota? Affects retry strategy.
 4. **Service accounts** — Do we need service account auth for automated/CI usage, or is OAuth2 + refresh token sufficient?
 5. **Scoping** — Do we need Manager (MCC) account features, or just single-account operations?
-6. **Protobuf vs REST** — Google Ads API supports both gRPC (protobuf) and REST (JSON). REST is simpler to implement; gRPC is more efficient. Recommendation: start with REST.
+6. **REST vs gRPC** — REST is simpler to implement; gRPC is more efficient for streaming large result sets. Recommendation: start with REST, add gRPC later if performance requires it.
+7. **Binary name** — `gads` is short and clean. Any conflicts? Alternative: `gadscli`, `gadsctl`.
