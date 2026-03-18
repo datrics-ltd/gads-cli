@@ -31,13 +31,13 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.3 Authentication — OAuth2
 
-- [ ] `gads auth login` — start local HTTP server, open browser to Google OAuth2 consent screen, handle callback, exchange code for tokens, store refresh token
-- [ ] Credential storage at `~/.gads/credentials.json` with `0600` permissions
-- [ ] Token refresh — auto-refresh expired access tokens before API calls using stored refresh token
-- [ ] `gads auth status` — show current auth state (logged in as who, token expiry, developer token configured?)
-- [ ] `gads auth logout` — revoke tokens and delete local credentials
-- [ ] `gads auth refresh` — force-refresh the access token
-- [ ] Support `GADS_ACCESS_TOKEN` env var for CI/non-interactive use (skip OAuth2 flow entirely)
+- [x] `gads auth login` — start local HTTP server, open browser to Google OAuth2 consent screen, handle callback, exchange code for tokens, store refresh token
+- [x] Credential storage at `~/.gads/credentials.json` with `0600` permissions
+- [x] Token refresh — auto-refresh expired access tokens before API calls using stored refresh token
+- [x] `gads auth status` — show current auth state (logged in as who, token expiry, developer token configured?)
+- [x] `gads auth logout` — revoke tokens and delete local credentials
+- [x] `gads auth refresh` — force-refresh the access token
+- [x] Support `GADS_ACCESS_TOKEN` env var for CI/non-interactive use (skip OAuth2 flow entirely)
 
 ### 1.4 API Client
 

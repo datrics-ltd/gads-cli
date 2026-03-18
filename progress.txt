@@ -23,6 +23,22 @@
 - Auto-create `~/.gads/` on first use (already in config.Init)
 - Env var precedence (GADS_ prefix) already wired in Phase 1.1; this phase validates it works
 
+### 2026-03-18 — Phase 1.3 Authentication — OAuth2
+- `internal/auth/credentials.go` — NEW: Credentials struct, Load/Save/Delete, CredentialsPath(); writes to `~/.gads/credentials.json` with 0600 perms
+- `internal/auth/oauth.go` — REWRITTEN: full OAuth2 flow
+  - `TokenSource` interface (preserved)
+  - `OAuthTokenSource` — implements TokenSource, auto-refreshes on expiry via stored refresh token
+  - `Login()` — starts local HTTP server on random port, opens browser via `github.com/pkg/browser`, waits for callback with CSRF state check, exchanges code for tokens, persists to credentials file
+  - `Logout()` — best-effort token revocation at Google, deletes local credentials
+  - `ForceRefresh()` — refreshes access token immediately using stored refresh token
+  - `GetStatus()` — returns AuthStatus (logged in, token expiry, dev token / client_id configured)
+- `cmd/auth.go` — NEW: `gads auth login|status|logout|refresh` subcommands
+  - `login`: calls auth.Login(), prints expiry and credentials path
+  - `status`: shows developer token, client_id, and login state; detects GADS_ACCESS_TOKEN env var
+  - `logout`: calls auth.Logout(), confirms deletion
+  - `refresh`: calls auth.ForceRefresh(), shows confirmation (debug token preview with --verbose)
+- Dependencies added: `golang.org/x/oauth2`, `golang.org/x/oauth2/google`, `github.com/pkg/browser`
+
 ## In Progress
 (none)
 
