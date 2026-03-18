@@ -21,13 +21,13 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.2 Configuration
 
-- [ ] Config file at `~/.gads/config.yaml` — auto-create directory on first use
-- [ ] `gads config set <key> <value>` — write to config file
-- [ ] `gads config get <key>` — read from config file
-- [ ] `gads config list` — show all config, redact sensitive values (tokens, secrets)
-- [ ] `gads config path` — print config file location
-- [ ] Environment variable overrides with `GADS_` prefix (see SPEC.md for mapping)
-- [ ] Precedence: flag > env var > config file > default
+- [x] Config file at `~/.gads/config.yaml` — auto-create directory on first use
+- [x] `gads config set <key> <value>` — write to config file
+- [x] `gads config get <key>` — read from config file
+- [x] `gads config list` — show all config, redact sensitive values (tokens, secrets)
+- [x] `gads config path` — print config file location
+- [x] Environment variable overrides with `GADS_` prefix (see SPEC.md for mapping)
+- [x] Precedence: flag > env var > config file > default
 
 ### 1.3 Authentication — OAuth2
 

@@ -14,6 +14,15 @@
 - `internal/output/formatter.go` — Formatter interface, Format type, ParseFormat
 - `.gitignore` — standard Go gitignore
 
+### 2026-03-18 — Phase 1.2 Configuration
+- `cmd/config_cmd.go` — `gads config set|get|list|path` subcommands
+  - `set`: reads existing YAML, updates key, writes back with 0600 perms
+  - `get`: reads effective value via viper (flag > env > file > default)
+  - `list`: reads config file + active GADS_ env vars, redacts sensitive keys (token/secret/password)
+  - `path`: prints `~/.gads/config.yaml` path
+- Auto-create `~/.gads/` on first use (already in config.Init)
+- Env var precedence (GADS_ prefix) already wired in Phase 1.1; this phase validates it works
+
 ## In Progress
 (none)
 
