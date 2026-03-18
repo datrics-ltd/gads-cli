@@ -211,6 +211,31 @@
   - Verifies SHA256 checksum against `checksums.txt` release asset
   - Atomically replaces the running binary: writes to a temp file in the same directory, then `os.Rename()` (preserves original file permissions)
 
+### 2026-03-18 — Phase 4.1 Schema Embedding
+- `gen/proto_fetch.sh` — NEW: bash script for sparse-checkout of `googleapis/googleapis`
+  - Fetches `google/ads/googleads/{version}/resources`, `enums`, `common` paths
+  - Uses `git sparse-checkout` at depth=1 for fast, small download
+  - Defaults to v18; accepts version as first arg (e.g. `gen/proto_fetch.sh v19`)
+  - Reports resource and enum proto counts; prints next-steps hint
+- `gen/codegen.go` — NEW: Go code generator (`//go:build ignore`)
+  - Parses resource `.proto` files in `gen/proto/google/ads/googleads/{version}/resources/`
+  - Extracts enum type definitions from `enums/` directory for `enum_values` population
+  - Maps proto types (string, int64, bool, google.type.Date, enum references) to schema data types
+  - Outputs sorted, deterministic JSON to `internal/schema/data/schema.json`
+  - Run with: `go run gen/codegen.go` (or `go run gen/codegen.go v19` for another version)
+- `internal/schema/metadata.go` — NEW: schema package with embedded field metadata
+  - Uses `//go:embed data/schema.json` to bundle schema into the binary at build time
+  - Exposes `Field` struct with Name, DataType, Category, Resource, Selectable, Filterable, Sortable, IsRepeated, Description, EnumValues
+  - API: `APIVersion()`, `GeneratedAt()`, `ListResources()`, `GetField(name)`, `GetFields(resource)`
+  - Filtering helpers: `GetSelectableFields()`, `GetFilterableFields()`, `GetSortableFields()`, `GetAttributeFields()`, `AllFields()`
+  - Lazy-loads schema on first call using `sync.Once`
+- `internal/schema/data/schema.json` — NEW: pre-generated schema (226 fields, API v18)
+  - Resources: campaign (45 fields), ad_group (15), ad_group_ad (21), ad_group_criterion (23), campaign_budget (13), customer (14), keyword_view (1)
+  - Metrics: 45 fields (clicks, impressions, cost_micros, ctr, conversions, CTR, video, active view, etc.)
+  - Segments: 29 fields (date, device, ad_network_type, conversion_action, product fields, etc.)
+  - All fields include selectable/filterable/sortable/is_repeated booleans and descriptions
+  - ENUM fields include enum_values arrays
+
 ## In Progress
 (none)
 

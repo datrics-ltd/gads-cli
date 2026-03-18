@@ -169,9 +169,9 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 4.1 Schema Embedding
 
-- [ ] `gen/proto_fetch.sh` — script to pull proto definitions from `googleapis/googleapis`
-- [ ] `gen/codegen.go` — parse protos, extract resource/field metadata
-- [ ] Embed metadata into binary at build time (Go `embed` package)
+- [x] `gen/proto_fetch.sh` — script to pull proto definitions from `googleapis/googleapis`
+- [x] `gen/codegen.go` — parse protos, extract resource/field metadata
+- [x] Embed metadata into binary at build time (Go `embed` package)
 
 ### 4.2 Schema Command
 
