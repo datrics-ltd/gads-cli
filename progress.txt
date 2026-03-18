@@ -283,6 +283,15 @@
 - `cmd/root.go` — UPDATED: `PersistentPreRunE` now calls `config.ApplyProfile(cmd)` after `config.Init()`
 - `internal/config/config_test.go` — UPDATED: 5 new tests covering ApplyProfile (no-op, override base, flag wins, env wins, profile-not-found)
 
+### 2026-03-18 — Phase 5.3 UX Polish
+- Terminal width detection and color coding were already implemented in Phase 1.5 (tablewriter `cfg.MaxWidth = termWidth()`, `fatih/color` status coloring)
+- `--verbose` debug output was already implemented (API client verbose logging + auth refresh preview)
+- `cmd/gen_man.go` — NEW: `gads gen-man <dir>` hidden command
+  - Uses Cobra's built-in `cobra/doc.GenManTree()` to generate man pages for all commands
+  - Creates output directory if it doesn't exist
+  - Writes one `.1` man page per command/subcommand (e.g. `gads-campaigns-list.1`)
+  - Added `github.com/cpuguy83/go-md2man/v2` + `github.com/russross/blackfriday/v2` dependencies (via `github.com/spf13/cobra/doc`)
+
 ## In Progress
 (none)
 

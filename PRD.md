@@ -203,10 +203,10 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 5.3 UX Polish
 
-- [ ] Terminal width detection for table column sizing
-- [ ] Color coding for campaign/ad/keyword statuses
-- [ ] `--verbose` debug output on all commands
-- [ ] Man page generation (Cobra built-in)
+- [x] Terminal width detection for table column sizing
+- [x] Color coding for campaign/ad/keyword statuses
+- [x] `--verbose` debug output on all commands
+- [x] Man page generation (Cobra built-in)
 - [ ] Help text polish — examples in every command's `--help`
 
 ---
