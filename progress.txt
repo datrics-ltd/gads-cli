@@ -168,6 +168,17 @@
   - Prints next-steps guide (config set, auth login)
   - Script marked executable (`chmod +x install.sh`)
 
+### 2026-03-18 — Phase 3.1 Install Script (install.ps1)
+- `install.ps1` — NEW: PowerShell Windows install script
+  - Detects that platform is `windows/amd64` (only supported Windows arch)
+  - Fetches latest release tag from GitHub API via `Invoke-RestMethod`; supports `$env:GITHUB_TOKEN` for private repo auth
+  - Downloads binary (`gads-windows-amd64.exe`) via `Invoke-WebRequest`
+  - Downloads `checksums.txt` and verifies SHA256 via `Get-FileHash`; gracefully skips if not present
+  - Installs to `$env:LOCALAPPDATA\Programs\gads\gads.exe` by default; overridable via `$env:GADS_INSTALL_DIR` or `-InstallDir` param
+  - Automatically adds install dir to the user's `PATH` env var if not already present (persists via `[Environment]::SetEnvironmentVariable`)
+  - Cleans up temp directory in `finally` block
+  - Prints next-steps guide (config set, auth login)
+
 ## In Progress
 (none)
 
