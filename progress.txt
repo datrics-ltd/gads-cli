@@ -179,6 +179,19 @@
   - Cleans up temp directory in `finally` block
   - Prints next-steps guide (config set, auth login)
 
+### 2026-03-18 — Phase 3.1 Private Repo Auth (install.sh + install.ps1)
+- `install.sh` — UPDATED: full `GITHUB_TOKEN` support
+  - Added `http_get` and `http_download` helper functions that inject `Authorization: token` header when `GITHUB_TOKEN` is set
+  - Parses asset API URLs (`https://api.github.com/repos/.../releases/assets/{id}`) from release JSON using portable grep+sed (no jq dependency)
+  - Downloads binary and checksums via asset API URL with `Accept: application/octet-stream` when token is present (correct approach for private repos)
+  - Falls back to `browser_download_url` when no token (public repos work without auth)
+  - Improved error message: hints to set `GITHUB_TOKEN` when version fetch fails on a private repo
+- `install.ps1` — UPDATED: full private-repo asset API URL support
+  - Parses `assets` array from `Invoke-RestMethod` response to get API asset URLs
+  - Uses asset API URL (with `Accept: application/octet-stream`) for binary and checksum downloads when `GITHUB_TOKEN` is set
+  - Falls back to `browser_download_url` when no token
+  - Improved error message: hints about token scope when API fetch fails
+
 ## In Progress
 (none)
 

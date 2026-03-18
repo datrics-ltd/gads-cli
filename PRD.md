@@ -147,7 +147,7 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 - [x] `install.sh` — detect OS/arch, download correct binary from GitHub Releases, verify SHA256 checksum, install to `~/.local/bin/gads` (or `/usr/local/bin` with sudo), print version + next steps
 - [x] `install.ps1` — PowerShell equivalent for Windows
-- [ ] Handle private repo auth (GitHub PAT in header or public release repo)
+- [x] Handle private repo auth (GitHub PAT in header or public release repo)
 
 ### 3.2 CI/CD
 

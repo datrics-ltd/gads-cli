@@ -1,6 +1,7 @@
 # gads-cli Windows installer
 # Usage: irm https://raw.githubusercontent.com/datrics-ltd/gads-cli/main/install.ps1 | iex
-# With GitHub PAT (private repo):
+#
+# Private repo auth (set before running):
 #   $env:GITHUB_TOKEN = "ghp_xxx"
 #   irm https://raw.githubusercontent.com/datrics-ltd/gads-cli/main/install.ps1 | iex
 
@@ -26,7 +27,7 @@ if ($InstallDir -eq "") {
     }
 }
 
-# Build request headers
+# Build request headers (token supports private repos)
 $Headers = @{ "User-Agent" = "gads-cli-installer" }
 if ($env:GITHUB_TOKEN) {
     $Headers["Authorization"] = "token $($env:GITHUB_TOKEN)"
@@ -39,6 +40,11 @@ try {
     $Release = Invoke-RestMethod -Uri $ApiUrl -Headers $Headers
 } catch {
     Write-Error "Failed to fetch latest release from $ApiUrl`n$_"
+    if ($env:GITHUB_TOKEN) {
+        Write-Error "GITHUB_TOKEN is set — verify it has 'repo' scope for private repos."
+    } else {
+        Write-Error "For private repos, set `$env:GITHUB_TOKEN before running this script."
+    }
     exit 1
 }
 
@@ -50,9 +56,22 @@ if (-not $Version) {
 
 Write-Host "Latest version: $Version"
 
-$BaseUrl      = "https://github.com/$Repo/releases/download/$Version"
-$BinaryUrl    = "$BaseUrl/$BinaryFile"
-$ChecksumUrl  = "$BaseUrl/checksums.txt"
+# Resolve download URLs.
+# For private repos we must use the asset API URL (with Accept: application/octet-stream
+# and Authorization header) rather than the browser_download_url which requires a browser session.
+# For public repos the browser_download_url works fine.
+$BinaryAsset   = $Release.assets | Where-Object { $_.name -eq $BinaryFile }   | Select-Object -First 1
+$ChecksumAsset = $Release.assets | Where-Object { $_.name -eq "checksums.txt" } | Select-Object -First 1
+
+$BaseUrl     = "https://github.com/$Repo/releases/download/$Version"
+$BinaryUrl   = if ($BinaryAsset -and $env:GITHUB_TOKEN) { $BinaryAsset.url } else { "$BaseUrl/$BinaryFile" }
+$ChecksumUrl = if ($ChecksumAsset -and $env:GITHUB_TOKEN) { $ChecksumAsset.url } else { "$BaseUrl/checksums.txt" }
+
+# Headers for asset API downloads (Accept header triggers binary redirect)
+$AssetHeaders = $Headers.Clone()
+if ($env:GITHUB_TOKEN) {
+    $AssetHeaders["Accept"] = "application/octet-stream"
+}
 
 # Create temp directory
 $TmpDir = Join-Path $env:TEMP "gads-install-$(Get-Random)"
@@ -65,7 +84,7 @@ try {
     # Download binary
     Write-Host "Downloading $BinaryFile..."
     try {
-        Invoke-WebRequest -Uri $BinaryUrl -OutFile $BinaryPath -Headers $Headers
+        Invoke-WebRequest -Uri $BinaryUrl -OutFile $BinaryPath -Headers $AssetHeaders
     } catch {
         Write-Error "Failed to download binary from $BinaryUrl`n$_"
         exit 1
@@ -74,7 +93,7 @@ try {
     # Download checksums (optional)
     $HasChecksums = $false
     try {
-        Invoke-WebRequest -Uri $ChecksumUrl -OutFile $ChecksumPath -Headers $Headers
+        Invoke-WebRequest -Uri $ChecksumUrl -OutFile $ChecksumPath -Headers $AssetHeaders
         $HasChecksums = $true
     } catch {
         Write-Warning "checksums.txt not found — skipping checksum verification"
