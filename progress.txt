@@ -101,6 +101,16 @@
   - `-H "Key: Value"` flag for custom headers (repeatable)
   - Routes response through output formatters when `--output json|csv` explicitly set
 
+### 2026-03-18 — Phase 1.8 Integration Testing
+- `internal/api/client_test.go` — NEW: 8 tests covering header injection (developer-token + Authorization), retry logic (429/500 → retry, 400 → no retry), POST body replay on retry, URL resolution, header redaction, and error mapping via mock httptest servers
+- `internal/api/errors_test.go` — NEW: 9 tests for ParseAPIError covering all known error types (queryError, authenticationError, authorizationError, quotaError, requestError), HTTP status fallback (401/403/429/500), raw body preservation, and extractErrorCode
+- `internal/auth/credentials_test.go` — NEW: 6 tests for IsExpired() (expired/valid/empty/30s buffer), SaveCredentials/LoadCredentials round-trip, 0600 file permissions, nil return for missing file, DeleteCredentials idempotency, and directory auto-creation
+- `internal/auth/oauth_test.go` — NEW: 7 tests for GetStatus (not logged in, env token, saved creds, expired creds, no dev token), OAuthTokenSource.AccessToken() without network, Refresh() error on missing refresh token; mock OAuth2 callback handler tests (invalid state → 400, error param → 401)
+- `internal/config/config_test.go` — NEW: 6 tests for config file read/write, GADS_ env var override, missing file handling, precedence order (Set > env > file), config path resolution, Init() directory auto-creation
+- `cmd/api_test.go` — NEW: 11 tests for parseHeaders (single/multiple/empty/invalid/whitespace trim), prettyPrintJSON (valid/invalid JSON), printDryRun (GET/POST with body/custom headers), {customer_id} path substitution, readBody (from flag/file/missing file)
+- `internal/output/formatter_test.go` — UPDATED: added TestCSVFormatterEscaping (RFC 4180 commas/quotes/embedded newlines with csv.Reader round-trip), TestTableFormatterColumnAlignment, TestJSONFormatterNumericTypes
+- All tests: `go test -short ./...` → all packages green; retry tests pass in full mode
+
 ## In Progress
 (none)
 

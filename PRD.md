@@ -80,11 +80,11 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.8 Integration Testing
 
-- [ ] Test auth flow with mock OAuth2 server
-- [ ] Test config read/write/precedence
-- [ ] Test output formatters with sample data (table alignment, JSON validity, CSV escaping)
-- [ ] Test `gads api` request construction (header injection, path substitution, dry-run output)
-- [ ] Test error handling and retry logic with mock API responses
+- [x] Test auth flow with mock OAuth2 server
+- [x] Test config read/write/precedence
+- [x] Test output formatters with sample data (table alignment, JSON validity, CSV escaping)
+- [x] Test `gads api` request construction (header injection, path substitution, dry-run output)
+- [x] Test error handling and retry logic with mock API responses
 
 ---
 

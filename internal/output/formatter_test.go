@@ -2,7 +2,9 @@ package output
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
+	"io"
 	"strings"
 	"testing"
 )
@@ -128,5 +130,103 @@ func TestParseFormat(t *testing.T) {
 	}
 	if _, err := ParseFormat("xml"); err == nil {
 		t.Error("ParseFormat('xml') should return error")
+	}
+}
+
+func TestCSVFormatterEscaping(t *testing.T) {
+	f := New(FormatCSV, Options{})
+	var buf bytes.Buffer
+	rows := []map[string]interface{}{
+		{"name": `Campaign, "Special"`, "clicks": float64(100)},
+		{"name": "Line\nBreak", "clicks": float64(200)},
+		{"name": `Quote"Inside`, "clicks": float64(300)},
+	}
+	if err := f.Format(&buf, []string{"name", "clicks"}, rows); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	out := buf.String()
+
+	// RFC 4180: value with comma and quotes → double-quoted with internal quotes doubled.
+	// Campaign, "Special" → "Campaign, ""Special"""
+	if !strings.Contains(out, `"Campaign, ""Special"""`) {
+		t.Errorf("expected RFC 4180 escaped value in CSV output:\n%s", out)
+	}
+	// Quote"Inside → "Quote""Inside"
+	if !strings.Contains(out, `"Quote""Inside"`) {
+		t.Errorf("expected RFC 4180 escaped quote in CSV output:\n%s", out)
+	}
+	// Line\nBreak → quoted multi-line field (RFC 4180 allows embedded newlines in quoted fields)
+	if !strings.Contains(out, "\"Line\nBreak\"") {
+		t.Errorf("expected RFC 4180 newline-embedded field in CSV output:\n%s", out)
+	}
+
+	// Verify round-trip: parse back with csv.Reader and check 3 data rows + 1 header.
+	// (encoding/csv properly handles quoted multi-line fields per RFC 4180.)
+	csvReader := csv.NewReader(strings.NewReader(out))
+	var records [][]string
+	for {
+		rec, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatalf("csv round-trip parse error: %v", err)
+		}
+		records = append(records, rec)
+	}
+	// header + 3 data rows = 4 records
+	if len(records) != 4 {
+		t.Errorf("expected 4 records (header + 3 data rows), got %d", len(records))
+	}
+}
+
+func TestTableFormatterColumnAlignment(t *testing.T) {
+	f := New(FormatTable, Options{NoColor: true})
+	var buf bytes.Buffer
+	headers := []string{"campaign", "clicks", "cost"}
+	rows := []map[string]interface{}{
+		{"campaign": "Brand - Search", "clicks": float64(1234), "cost": float64(892.34)},
+		{"campaign": "Generic Display", "clicks": float64(567), "cost": float64(234.56)},
+	}
+	if err := f.Format(&buf, headers, rows); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	out := buf.String()
+	// Row data should be present.
+	if !strings.Contains(out, "Brand - Search") {
+		t.Errorf("expected 'Brand - Search' in output:\n%s", out)
+	}
+	if !strings.Contains(out, "Generic Display") {
+		t.Errorf("expected 'Generic Display' in output:\n%s", out)
+	}
+	// Numeric values should be formatted.
+	if !strings.Contains(out, "1,234") {
+		t.Errorf("expected formatted number '1,234' in output:\n%s", out)
+	}
+}
+
+func TestJSONFormatterNumericTypes(t *testing.T) {
+	f := New(FormatJSON, Options{})
+	var buf bytes.Buffer
+	rows := []map[string]interface{}{
+		{"name": "Campaign A", "clicks": float64(1234), "ctr": float64(2.71)},
+	}
+	if err := f.Format(&buf, []string{"name", "clicks", "ctr"}, rows); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	var arr []map[string]interface{}
+	if err := json.Unmarshal(buf.Bytes(), &arr); err != nil {
+		t.Fatalf("output is not valid JSON: %v\n%s", err, buf.String())
+	}
+	if len(arr) != 1 {
+		t.Fatalf("expected 1 row, got %d", len(arr))
+	}
+	// Numbers should be numbers, not strings.
+	clicks, ok := arr[0]["clicks"].(float64)
+	if !ok {
+		t.Errorf("expected clicks to be float64, got %T", arr[0]["clicks"])
+	}
+	if clicks != 1234 {
+		t.Errorf("clicks: got %v, want 1234", clicks)
 	}
 }
