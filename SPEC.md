@@ -858,12 +858,17 @@ Once built: `~/.openclaw/workspace-lucius/skills/gads/SKILL.md` (or published to
 
 ---
 
+## Decisions (Resolved)
+
+1. **Google Ads API version** — Latest available (v18+ — verify current at build time)
+2. **Currency** — Default to GBP (£). Auto-detect from account if available.
+3. **Rate limiting** — TBD. Default retry strategy (3 retries, exponential backoff) until we know our quota.
+4. **Service accounts** — Not needed. OAuth2 refresh token is sufficient for the team.
+5. **Scoping** — Single account only. No MCC/Manager account features needed.
+6. **REST vs gRPC** — REST. Simpler, sufficient for our scale. Revisit if performance requires it.
+7. **Binary name** — `gads`.
+
 ## Open Questions
 
-1. **Google Ads API version** — Which version are we targeting? (v18 is latest as of early 2026)
-2. **Currency** — Should we auto-detect from the account or default to EUR?
-3. **Rate limiting** — What's our quota? Affects retry strategy.
-4. **Service accounts** — Do we need service account auth for automated/CI usage, or is OAuth2 + refresh token sufficient?
-5. **Scoping** — Do we need Manager (MCC) account features, or just single-account operations?
-6. **REST vs gRPC** — REST is simpler to implement; gRPC is more efficient for streaming large result sets. Recommendation: start with REST, add gRPC later if performance requires it.
-7. **Binary name** — `gads` is short and clean. Any conflicts? Alternative: `gadscli`, `gadsctl`.
+1. **OAuth2 credentials** — Which Google Cloud project holds the OAuth2 client ID + secret? Or do we need to create one?
+2. **Distribution** — Private repo install: separate public releases repo, shared GitHub PAT, or host binaries elsewhere?
