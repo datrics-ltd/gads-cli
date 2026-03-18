@@ -151,11 +151,11 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 3.2 CI/CD
 
-- [ ] `.github/workflows/release.yml` — trigger on `v*` tags
-- [ ] Cross-compile for: `linux/amd64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`
-- [ ] Generate SHA256 checksums file
-- [ ] Create GitHub Release with all binaries + checksums
-- [ ] Version embedding via `-ldflags "-X main.version=$TAG"`
+- [x] `.github/workflows/release.yml` — trigger on `v*` tags
+- [x] Cross-compile for: `linux/amd64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`
+- [x] Generate SHA256 checksums file
+- [x] Create GitHub Release with all binaries + checksums
+- [x] Version embedding via `-ldflags "-X main.version=$TAG"`
 
 ### 3.3 Self-Update
 

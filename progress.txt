@@ -192,6 +192,16 @@
   - Falls back to `browser_download_url` when no token
   - Improved error message: hints about token scope when API fetch fails
 
+### 2026-03-18 — Phase 3.2 CI/CD (release.yml)
+- `.github/workflows/release.yml` — NEW: GitHub Actions release workflow
+  - Triggers on `v*` tags pushed to the repository
+  - Matrix build job cross-compiles for: `linux/amd64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`
+  - Injects version at build time via `-ldflags "-s -w -X main.version=${{ github.ref_name }}"`
+  - Uploads each platform binary as a workflow artifact (retained 1 day)
+  - Release job downloads all artifacts, generates `checksums.txt` via `sha256sum`
+  - Creates GitHub Release via `softprops/action-gh-release@v2` with all binaries + checksums
+  - `generate_release_notes: true` auto-generates notes from commit history
+
 ## In Progress
 (none)
 
