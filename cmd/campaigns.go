@@ -227,4 +227,10 @@ func init() {
 
 	campaignsCmd.AddCommand(campaignsListCmd, campaignsGetCmd, campaignsPauseCmd, campaignsEnableCmd, campaignsStatsCmd)
 	rootCmd.AddCommand(campaignsCmd)
+
+	// Shell completions
+	_ = campaignsListCmd.RegisterFlagCompletionFunc("status", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"ENABLED", "PAUSED", "REMOVED"}, cobra.ShellCompDirectiveNoFileComp
+	})
+	_ = campaignsStatsCmd.RegisterFlagCompletionFunc("date-range", dateRangeCompletion)
 }

@@ -183,7 +183,7 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 ### 4.3 Validation & Completion
 
 - [x] GAQL query validation — check field names and resource compatibility before sending to API
-- [ ] Shell completions for bash, zsh, fish, PowerShell (Cobra built-in + custom field completions)
+- [x] Shell completions for bash, zsh, fish, PowerShell (Cobra built-in + custom field completions)
 
 ---
 

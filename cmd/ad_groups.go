@@ -228,4 +228,7 @@ func init() {
 
 	adGroupsCmd.AddCommand(adGroupsListCmd, adGroupsGetCmd, adGroupsPauseCmd, adGroupsEnableCmd, adGroupsStatsCmd)
 	rootCmd.AddCommand(adGroupsCmd)
+
+	// Shell completions
+	_ = adGroupsStatsCmd.RegisterFlagCompletionFunc("date-range", dateRangeCompletion)
 }

@@ -286,4 +286,9 @@ func init() {
 
 	keywordsCmd.AddCommand(keywordsListCmd, keywordsGetCmd, keywordsPauseCmd, keywordsEnableCmd, keywordsAddCmd)
 	rootCmd.AddCommand(keywordsCmd)
+
+	// Shell completions
+	_ = keywordsAddCmd.RegisterFlagCompletionFunc("match-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"BROAD", "PHRASE", "EXACT"}, cobra.ShellCompDirectiveNoFileComp
+	})
 }

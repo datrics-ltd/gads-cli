@@ -257,6 +257,17 @@
 - `internal/schema/validate_test.go` — NEW: 12 tests covering all validation paths
 - `cmd/query.go` — UPDATED: validates GAQL before sending to API; `--no-validate` flag bypasses local validation
 
+### 2026-03-18 — Phase 4.3 Shell Completions
+- `cmd/completion.go` — NEW: `gads completion [bash|zsh|fish|powershell]` command
+  - Uses Cobra's built-in `GenBashCompletionV2`, `GenZshCompletion`, `GenFishCompletion`, `GenPowerShellCompletionWithDesc`
+  - Includes install instructions for each shell in `--help`
+  - `--output` flag completion (table, json, csv) registered on root persistent flags
+  - `gads schema [resource]` completion — completes resource names from embedded schema via `schema.ListResources()`
+  - `dateRangeCompletion` helper for all `--date-range` flags
+- `cmd/campaigns.go` — UPDATED: `--status` flag completion (ENABLED, PAUSED, REMOVED), `--date-range` completion for stats
+- `cmd/ad_groups.go` — UPDATED: `--date-range` completion for stats
+- `cmd/keywords.go` — UPDATED: `--match-type` completion (BROAD, PHRASE, EXACT)
+
 ## In Progress
 (none)
 
