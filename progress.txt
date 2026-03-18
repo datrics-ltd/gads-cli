@@ -129,6 +129,13 @@
   - `enable <ad-group-id>`: same mutate pattern, sets status to ENABLED
   - `stats <ad-group-id>`: GAQL with date filter; `--date-range` for presets (LAST_7_DAYS default), `--from`/`--to` for custom BETWEEN range; shows clicks, impressions, cost, CTR, conversions, conversion_rate, average_cpc
 
+### 2026-03-18 — Phase 2.3 Ads
+- `cmd/ads.go` — NEW: `gads ads` command with four subcommands
+  - `list`: GAQL query against `ad_group_ad` resource; shows ad ID, name, type, status, ad group ID/name, campaign ID/name, clicks, impressions, cost, CTR; `--campaign` flag filters by campaign ID, `--ad-group` flag filters by ad group ID
+  - `get <ad-id>`: GAQL lookup by `ad_group_ad.ad.id`; shows same fields plus final_urls and conversions
+  - `pause <ad-id>`: looks up resource name via GAQL, then POSTs to `adGroupAds:mutate` with `updateMask=status`, sets status to PAUSED
+  - `enable <ad-id>`: same mutate pattern, sets status to ENABLED
+
 ## In Progress
 (none)
 
