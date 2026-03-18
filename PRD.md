@@ -94,13 +94,13 @@ These are Tier 1 ergonomic wrappers. Each is a thin layer over GAQL (for reads) 
 
 ### 2.1 Campaigns
 
-- [ ] `gads campaigns list` — list all campaigns with ID, name, status, budget, basic metrics
-- [ ] `gads campaigns list --status <ENABLED|PAUSED|REMOVED>` — filter by status
-- [ ] `gads campaigns get <campaign-id>` — detailed view of a single campaign
-- [ ] `gads campaigns pause <campaign-id>` — set campaign status to PAUSED
-- [ ] `gads campaigns enable <campaign-id>` — set campaign status to ENABLED
-- [ ] `gads campaigns stats <campaign-id> --date-range <range>` — performance metrics with date range support
-- [ ] `gads campaigns stats <campaign-id> --from <date> --to <date>` — custom date range
+- [x] `gads campaigns list` — list all campaigns with ID, name, status, budget, basic metrics
+- [x] `gads campaigns list --status <ENABLED|PAUSED|REMOVED>` — filter by status
+- [x] `gads campaigns get <campaign-id>` — detailed view of a single campaign
+- [x] `gads campaigns pause <campaign-id>` — set campaign status to PAUSED
+- [x] `gads campaigns enable <campaign-id>` — set campaign status to ENABLED
+- [x] `gads campaigns stats <campaign-id> --date-range <range>` — performance metrics with date range support
+- [x] `gads campaigns stats <campaign-id> --from <date> --to <date>` — custom date range
 
 ### 2.2 Ad Groups
 

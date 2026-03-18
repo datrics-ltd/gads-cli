@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/datrics-ltd/gads-cli/internal/output"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -60,27 +58,7 @@ func runQuery(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmtStr := viper.GetString("output")
-	format, err := output.ParseFormat(fmtStr)
-	if err != nil {
-		return err
-	}
-
-	opts := output.Options{
-		NoColor: viper.GetBool("no_color"),
-		Compact: viper.GetBool("compact"),
-		BOM:     viper.GetBool("bom"),
-		Verbose: viper.GetBool("verbose"),
-		Meta: output.Meta{
-			CustomerID: customerID,
-			Query:      gaql,
-			Rows:       len(rows),
-			Timestamp:  time.Now().UTC().Format(time.RFC3339),
-		},
-	}
-
-	formatter := output.New(format, opts)
-	return formatter.Format(os.Stdout, headers, rows)
+	return renderOutput(headers, rows, customerID, gaql)
 }
 
 func init() {

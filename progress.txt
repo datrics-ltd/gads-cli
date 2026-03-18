@@ -111,6 +111,16 @@
 - `internal/output/formatter_test.go` — UPDATED: added TestCSVFormatterEscaping (RFC 4180 commas/quotes/embedded newlines with csv.Reader round-trip), TestTableFormatterColumnAlignment, TestJSONFormatterNumericTypes
 - All tests: `go test -short ./...` → all packages green; retry tests pass in full mode
 
+### 2026-03-18 — Phase 2.1 Campaigns
+- `cmd/campaigns.go` — NEW: `gads campaigns` command with five subcommands
+  - `list`: GAQL query against `campaign` resource; shows ID, name, status, budget (amount_micros), clicks, impressions, cost, CTR; `--status` flag filters by ENABLED/PAUSED/REMOVED
+  - `get <campaign-id>`: GAQL lookup by campaign.id; shows same fields plus advertising_channel_type and conversions
+  - `pause <campaign-id>`: POST to `campaigns:mutate` with `updateMask=status`, sets status to PAUSED
+  - `enable <campaign-id>`: same mutate pattern, sets status to ENABLED
+  - `stats <campaign-id>`: GAQL with date filter; `--date-range` for presets (LAST_7_DAYS default), `--from`/`--to` for custom BETWEEN range; shows clicks, impressions, cost, CTR, conversions, conversion_rate, average_cpc
+- `cmd/helpers.go` — UPDATED: added shared `renderOutput()` helper (format + options from viper, writes to stdout)
+- `cmd/query.go` — UPDATED: refactored to use shared `renderOutput()` helper
+
 ## In Progress
 (none)
 
