@@ -50,10 +50,10 @@ After this phase, the CLI can do everything the Google Ads API supports via `gad
 
 ### 1.5 Output Formatters
 
-- [ ] Formatter interface — all commands produce structured data, formatters render it
-- [ ] **Table formatter** — aligned columns, header row, number formatting (commas, decimals), currency symbols, percentage formatting, terminal width detection, truncation with `...`, color coding (green=enabled, yellow=paused, red=removed), respects `--no-color` and `NO_COLOR` env var, footer row with totals where appropriate
-- [ ] **JSON formatter** — valid JSON array of objects, snake_case field names, numbers as numbers, pretty-printed by default, `--compact` flag for single-line, metadata envelope in `--verbose` mode
-- [ ] **CSV formatter** — RFC 4180 compliant, header row, proper escaping, UTF-8, `--bom` flag for Excel compatibility, raw numbers (no formatting/currency symbols)
+- [x] Formatter interface — all commands produce structured data, formatters render it
+- [x] **Table formatter** — aligned columns, header row, number formatting (commas, decimals), currency symbols, percentage formatting, terminal width detection, truncation with `...`, color coding (green=enabled, yellow=paused, red=removed), respects `--no-color` and `NO_COLOR` env var, footer row with totals where appropriate
+- [x] **JSON formatter** — valid JSON array of objects, snake_case field names, numbers as numbers, pretty-printed by default, `--compact` flag for single-line, metadata envelope in `--verbose` mode
+- [x] **CSV formatter** — RFC 4180 compliant, header row, proper escaping, UTF-8, `--bom` flag for Excel compatibility, raw numbers (no formatting/currency symbols)
 
 ### 1.6 GAQL Queries (Tier 2)
 

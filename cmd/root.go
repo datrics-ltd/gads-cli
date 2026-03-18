@@ -53,6 +53,8 @@ func init() {
 	pf.BoolP("quiet", "q", false, "Suppress all non-data output")
 	pf.Bool("no-color", false, "Disable colored output")
 	pf.Int("retries", 3, "Maximum number of retries for transient API errors")
+	pf.Bool("compact", false, "JSON output: single-line (no pretty-print)")
+	pf.Bool("bom", false, "CSV output: prepend UTF-8 BOM for Excel compatibility")
 
 	// Bind flags to viper
 	mustBind("customer_id", "customer-id")
@@ -62,6 +64,8 @@ func init() {
 	mustBind("quiet", "quiet")
 	mustBind("no_color", "no-color")
 	mustBind("retries", "retries")
+	mustBind("compact", "compact")
+	mustBind("bom", "bom")
 
 	// Env var prefix: GADS_
 	viper.SetEnvPrefix("GADS")

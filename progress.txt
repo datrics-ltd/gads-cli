@@ -54,6 +54,25 @@
   - Falls back to HTTP status mapping for unstructured errors
 - `cmd/root.go` — added `--retries` flag (default 3), bound to viper key `retries`
 
+### 2026-03-18 — Phase 1.5 Output Formatters
+- `internal/output/formatter.go` — UPDATED: added `Options`, `Meta`, `New()` factory; `New()` dispatches to the right formatter based on format type and options
+- `internal/output/table.go` — NEW: `TableFormatter` using `olekukonko/tablewriter` v1.1.4
+  - Borderless layout with header separator line
+  - Color coding: ENABLED=green, PAUSED=yellow, REMOVED=red via `fatih/color` (respects `--no-color` and `NO_COLOR` env var)
+  - Number formatting with comma separators (1,234 / 1,234.56)
+  - Footer row with column totals for numeric data when >1 row present (excludes ID columns)
+  - Terminal width detection via `golang.org/x/term` with `COLUMNS` env var fallback
+- `internal/output/json.go` — NEW: `JSONFormatter`
+  - Pretty-printed by default; `--compact` for single-line
+  - Verbose mode wraps output in `{"meta": {...}, "data": [...]}` envelope
+- `internal/output/csv.go` — NEW: `CSVFormatter`
+  - RFC 4180 compliant via stdlib `encoding/csv`
+  - Optional UTF-8 BOM via `--bom` flag for Excel compatibility
+  - Raw numbers (no comma formatting or currency symbols)
+- `internal/output/formatter_test.go` — NEW: 8 unit tests covering all formatters
+- `cmd/root.go` — added `--compact` and `--bom` persistent flags, bound to viper
+- Dependencies added: `olekukonko/tablewriter`, `fatih/color`, `golang.org/x/term`
+
 ## In Progress
 (none)
 
