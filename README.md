@@ -76,7 +76,7 @@ This walks you through:
 1. **Developer token** — from Google Ads → Tools & Settings → API Center
 2. **OAuth2 client ID + secret** — from [Google Cloud Console](https://console.cloud.google.com/apis/credentials) (create a Desktop app credential)
 3. **Customer ID** — the 10-digit number from your Google Ads dashboard
-4. **Login Customer ID** — only if accessing accounts through a Manager (MCC) account
+4. **Login Customer ID** — leave blank for most users. Only set this if your Google account does not have direct access to the ad account and must go through a Manager (MCC) account. The value is the MCC's customer ID (not the ad account's). Setting this incorrectly causes authorization errors that are hard to diagnose.
 5. **OAuth2 login** — opens your browser to authenticate with Google
 6. **Verification** — runs a test query to confirm everything works
 
@@ -91,6 +91,8 @@ gads config set developer_token "YOUR_DEVELOPER_TOKEN"
 gads config set client_id "YOUR_CLIENT_ID.apps.googleusercontent.com"
 gads config set client_secret "YOUR_CLIENT_SECRET"
 gads config set customer_id "YOUR_CUSTOMER_ID"
+# login_customer_id: omit unless your account is accessed through a Manager (MCC) account
+# gads config set login_customer_id "YOUR_MCC_CUSTOMER_ID"
 
 gads auth login
 ```
@@ -264,7 +266,7 @@ developer_token: "your-developer-token"
 client_id: "your-client-id.apps.googleusercontent.com"
 client_secret: "your-client-secret"
 customer_id: "1234567890"
-login_customer_id: ""  # optional, only for MCC access
+login_customer_id: ""  # omit unless accessing via a Manager (MCC) account — setting this incorrectly causes auth errors
 ```
 
 ### Environment Variables

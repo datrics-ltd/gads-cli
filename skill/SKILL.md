@@ -44,7 +44,7 @@ Use for: mutations not covered by named commands. `{customer_id}` auto-replaces 
 Every request sends three headers automatically:
 - `developer-token` — static, from config (proves API access)
 - `Authorization: Bearer` — OAuth2 access token, auto-refreshed (proves user identity)
-- `login-customer-id` — optional, only when accessing via MCC
+- `login-customer-id` — only set when the authenticated Google account accesses the ad account *through* a Manager (MCC) account. The value is the MCC's customer ID. Leave unset for direct account access — setting it when not needed causes authorization errors.
 
 Config lives at `~/.gads/config.yaml`. Credentials at `~/.gads/credentials.json`.
 
@@ -110,6 +110,11 @@ For constructing mutations via `gads api` (create campaigns, add keywords, updat
 ## Named Commands Reference
 
 For all Tier 1 commands with flags and examples, read [references/commands.md](references/commands.md).
+
+## Troubleshooting
+
+- **Auth errors?** Check if `login_customer_id` is set when it shouldn't be. If you have direct account access (not via MCC), this field must be empty. Remove it with: `gads config set login_customer_id ''`
+- **Unexpected 403/authorization errors?** The most common cause is a `login_customer_id` set for an account you access directly — remove it.
 
 ## Error Handling
 
