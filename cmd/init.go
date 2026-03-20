@@ -92,9 +92,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 	// Login customer ID (MCC) — optional
 	fmt.Println()
 	fmt.Println("5. Login customer ID (MCC) — optional")
-	fmt.Println("   Only needed if you access this account through a manager (MCC) account.")
-	fmt.Println("   Leave blank to skip.")
-	fmt.Print("   Login customer ID: ")
+	fmt.Println("   Leave blank unless you access this account through a Manager (MCC) account.")
+	fmt.Println("   Most users should press Enter to skip.")
+	fmt.Println("   If needed, enter the MCC's customer ID (not the ad account's).")
+	fmt.Println("   Warning: setting this incorrectly will cause authorization errors.")
+	fmt.Print("   Login customer ID (or Enter to skip): ")
 	scanner.Scan()
 	loginCustomerID := strings.TrimSpace(scanner.Text())
 
