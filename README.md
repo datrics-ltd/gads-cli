@@ -340,6 +340,10 @@ go build -ldflags "-s -w -X main.version=v0.1.0" -o gads .
 
 See [SPEC.md](./SPEC.md) for the full technical specification including architecture decisions, three-tier command model, auth flow details, and code generation strategy.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues and submit pull requests.
+
 ## License
 
 MIT License
