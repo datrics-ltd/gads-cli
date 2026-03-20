@@ -342,4 +342,4 @@ See [SPEC.md](./SPEC.md) for the full technical specification including architec
 
 ## License
 
-Private — Datrics Ltd.
+MIT License
