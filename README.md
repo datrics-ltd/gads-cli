@@ -22,6 +22,47 @@ irm https://raw.githubusercontent.com/datrics-ltd/gads-cli/main/install.ps1 | ie
 
 Download the binary for your platform from [Releases](https://github.com/datrics-ltd/gads-cli/releases), move it somewhere in your PATH, and `chmod +x gads`.
 
+## Prerequisites
+
+Before running `gads init`, you need a few things set up in Google Ads and Google Cloud.
+
+### 1. Google Ads Developer Token
+
+You need a Google Ads account with API access. In your Google Ads account, go to **Tools & Settings → API Center** and apply for a developer token.
+
+New tokens start as **test tokens** — they only work against test accounts. Apply for **Standard access** when you're ready to use it with real accounts. This review can take a few days.
+
+→ [Get a developer token](https://developers.google.com/google-ads/api/docs/get-started/dev-token)
+
+### 2. Google Cloud Project
+
+Create a project (or use an existing one) at [console.cloud.google.com](https://console.cloud.google.com). This is where you'll enable the API and create OAuth credentials.
+
+### 3. Enable the Google Ads API
+
+In your Cloud project, go to **APIs & Services → Library**, search for **Google Ads API**, and enable it.
+
+→ [Enable Google Ads API](https://console.cloud.google.com/apis/library/googleads.googleapis.com)
+
+### 4. OAuth Consent Screen
+
+Go to **APIs & Services → OAuth consent screen** and configure it:
+
+- **Internal** — if your org uses Google Workspace and you only need access for internal users (no review required)
+- **External** — for personal Google accounts or external users; you'll need to add yourself as a test user while in testing mode
+
+Required scope: `https://www.googleapis.com/auth/adwords`
+
+→ [Configure OAuth consent screen](https://developers.google.com/google-ads/api/docs/oauth/cloud-project#configure_the_oauth_consent_screen)
+
+### 5. Create OAuth Desktop Credentials
+
+Go to **APIs & Services → Credentials → Create Credentials → OAuth client ID**. Set application type to **Desktop app**. Copy the **client ID** and **client secret** — you'll need these in `gads init`.
+
+→ [Create credentials](https://console.cloud.google.com/apis/credentials)
+
+---
+
 ## Setup
 
 Run the interactive setup wizard:
